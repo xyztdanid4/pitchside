@@ -6,6 +6,8 @@ const config: KnipConfig = {
   includeEntryExports: true,
 
   ignore: [
+    // Loaded by Lighthouse CI (`lhci autorun`), which knip doesn't detect
+    'lighthouserc.cjs',
     // Loaded by a <link> in index.html, which knip doesn't follow
     'public/noscript.css',
   ],

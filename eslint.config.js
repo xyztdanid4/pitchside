@@ -349,10 +349,24 @@ export default defineConfig([
 
   {
     // Plain JS files are not part of any tsconfig, so type-aware rules can't run on them
-    files: ['**/*.js'],
+    files: ['**/*.{js,cjs}'],
     extends: [tseslint.configs.disableTypeChecked],
     languageOptions: {
       globals: globals.node,
+    },
+  },
+
+  {
+    // CommonJS config files, for tools that load their config with `require`
+    // (lighthouserc.cjs)
+    files: ['**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+    },
+    rules: {
+      // `require` / `module.exports` are what these tools expect
+      '@typescript-eslint/no-require-imports': 'off',
+      'unicorn/prefer-module': 'off',
     },
   },
 

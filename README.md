@@ -52,6 +52,7 @@ Dependencies are installed automatically; run `pnpm dev` inside the container.
 | `pnpm test:coverage`    | Run tests with a coverage report                               |
 | `pnpm test:e2e`         | Run end-to-end tests in a real browser                         |
 | `pnpm test:e2e:install` | Download the browser for end-to-end tests                      |
+| `pnpm lighthouse`       | Audit the production build with Lighthouse CI                  |
 | `pnpm lint`             | Run ESLint                                                     |
 | `pnpm lint:css`         | Run Stylelint                                                  |
 | `pnpm knip`             | Find unused files, exports and dependencies                    |
@@ -97,6 +98,22 @@ This runs the tests in Playwright's official image against the `web` container.
 
 This builds the app, serves it with `vite preview` and runs the tests. An HTML report is written to
 `playwright-report/`, with traces of failed tests (`pnpm exec playwright show-report`).
+
+## Lighthouse
+
+```bash
+pnpm lighthouse
+```
+
+Builds the app and audits it three times with Lighthouse CI, using the Chromium installed for the
+end-to-end tests (`pnpm test:e2e:install`).
+
+- **Fails** if accessibility, best practices or SEO score below 100, or if Cumulative Layout Shift
+  is above 0.1 (content jumping while the page loads).
+- **Warns** if performance is below 90, Largest Contentful Paint above 2.5 s or Total Blocking Time
+  above 200 ms. These depend on the machine's load, so they don't fail the run.
+
+Reports are written to `.lighthouseci/`.
 
 ## Git hooks
 
