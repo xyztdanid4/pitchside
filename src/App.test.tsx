@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { App } from './App.tsx'
-import { expectNoAxeViolations } from './test/axe.ts'
+import { App } from '@/App.tsx'
+import { expectNoAxeViolations } from '@/test/axe.ts'
 
 describe('App', () => {
   it('renders the app name as the main heading', () => {

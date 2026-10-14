@@ -220,6 +220,28 @@ export default defineConfig([
   },
 
   {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      // Project files are always imported through the `@/` alias, never by relative
+      // path. Every import of a file looks the same from anywhere in the tree, and
+      // moving a file doesn't break the imports inside it.
+      //   ✗ import { App } from '../App.tsx'
+      //   ✓ import { App } from '@/App.tsx'
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: String.raw`^\.{1,2}/`,
+              message: 'Import project files through the `@/` alias instead of a relative path.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  {
     files: ['**/*.tsx'],
     extends: [
       eslintReact.configs['strict-type-checked'],
