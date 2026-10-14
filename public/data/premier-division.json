@@ -1,0 +1,130 @@
+{
+  "competition": {
+    "id": "premier-division",
+    "name": "Premier Division"
+  },
+  "teams": [
+    { "id": "ashford", "name": "Ashford United" },
+    { "id": "bridgeford", "name": "Bridgeford FC" },
+    { "id": "castle-athletic", "name": "Castle Athletic" },
+    { "id": "dunwich", "name": "Dunwich Town" },
+    { "id": "eastvale", "name": "Eastvale Rovers" },
+    { "id": "fairview", "name": "Fairview FC" },
+    { "id": "glenhaven", "name": "Glenhaven City" },
+    { "id": "highmoor", "name": "Highmoor Athletic" }
+  ],
+  "matches": [
+    {
+      "id": "m01",
+      "homeTeamId": "ashford",
+      "awayTeamId": "bridgeford",
+      "homeScore": 2,
+      "awayScore": 0,
+      "status": "completed"
+    },
+    {
+      "id": "m02",
+      "homeTeamId": "castle-athletic",
+      "awayTeamId": "dunwich",
+      "homeScore": 1,
+      "awayScore": 1,
+      "status": "completed"
+    },
+    {
+      "id": "m03",
+      "homeTeamId": "eastvale",
+      "awayTeamId": "fairview",
+      "homeScore": 0,
+      "awayScore": 0,
+      "status": "completed"
+    },
+    {
+      "id": "m04",
+      "homeTeamId": "glenhaven",
+      "awayTeamId": "highmoor",
+      "homeScore": 3,
+      "awayScore": 1,
+      "status": "completed"
+    },
+    {
+      "id": "m05",
+      "homeTeamId": "ashford",
+      "awayTeamId": "castle-athletic",
+      "homeScore": 1,
+      "awayScore": 1,
+      "status": "completed"
+    },
+    {
+      "id": "m06",
+      "homeTeamId": "bridgeford",
+      "awayTeamId": "dunwich",
+      "homeScore": 2,
+      "awayScore": 1,
+      "status": "completed"
+    },
+    {
+      "id": "m07",
+      "homeTeamId": "eastvale",
+      "awayTeamId": "glenhaven",
+      "homeScore": 1,
+      "awayScore": 2,
+      "status": "completed"
+    },
+    {
+      "id": "m08",
+      "homeTeamId": "fairview",
+      "awayTeamId": "highmoor",
+      "homeScore": 0,
+      "awayScore": 0,
+      "status": "completed"
+    },
+    {
+      "id": "m09",
+      "homeTeamId": "ashford",
+      "awayTeamId": "dunwich",
+      "homeScore": 0,
+      "awayScore": 1,
+      "status": "completed"
+    },
+    {
+      "id": "m10",
+      "homeTeamId": "bridgeford",
+      "awayTeamId": "castle-athletic",
+      "homeScore": 0,
+      "awayScore": 0,
+      "status": "completed"
+    },
+    {
+      "id": "m11",
+      "homeTeamId": "eastvale",
+      "awayTeamId": "highmoor",
+      "homeScore": 2,
+      "awayScore": 2,
+      "status": "completed"
+    },
+    {
+      "id": "m12",
+      "homeTeamId": "fairview",
+      "awayTeamId": "glenhaven",
+      "homeScore": 1,
+      "awayScore": 0,
+      "status": "completed"
+    },
+    {
+      "id": "m13",
+      "homeTeamId": "ashford",
+      "awayTeamId": "fairview",
+      "homeScore": 0,
+      "awayScore": 2,
+      "status": "live"
+    },
+    {
+      "id": "m14",
+      "homeTeamId": "dunwich",
+      "awayTeamId": "eastvale",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "scheduled"
+    }
+  ]
+}
