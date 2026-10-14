@@ -1,0 +1,71 @@
+name: CI
+
+# Runs every check from a clean checkout, so only committed code is tested.
+#
+# Automatic triggers are intentionally disabled to save GitHub Actions minutes; the
+# workflow only runs when started by hand (Actions tab -> CI -> Run workflow).
+# To run it on every push and pull request, add:
+#
+#   push:
+#     branches: [main]
+#   pull_request:
+on:
+  workflow_dispatch:
+
+# Read-only access to the repository is all the jobs need
+permissions:
+  contents: read
+
+# A new run for the same branch cancels the one still in progress
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, type check, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      # pnpm version comes from `packageManager` in package.json
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm lint:css
+      - run: pnpm typecheck
+      - run: pnpm test:coverage
+      - run: pnpm knip
+      - run: pnpm depcruise
+
+  browser:
+    name: End-to-end tests, Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Chromium plus the system libraries it needs on Ubuntu
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - run: pnpm test:e2e
+      - run: pnpm lighthouse
+
+      # Reports are kept for a week for debugging, also when a step above failed
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            playwright-report/
+            .lighthouseci/
+          retention-days: 7

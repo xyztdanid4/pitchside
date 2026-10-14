@@ -126,3 +126,13 @@ Installed automatically by `pnpm install` (Husky):
 | `pre-push`   | Type check, tests, knip and dependency-cruiser               |
 
 [cc]: https://www.conventionalcommits.org/
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs every check from a clean checkout, so only committed code is
+tested: formatting, ESLint, Stylelint, type check, unit tests with coverage, knip,
+dependency-cruiser, end-to-end tests and Lighthouse. Reports are uploaded as artifacts.
+
+Automatic triggers are disabled to save GitHub Actions minutes: the workflow runs only when started
+by hand (_Actions_ → _CI_ → _Run workflow_). Adding `push` and `pull_request` triggers enables it on
+every change.
