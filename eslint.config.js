@@ -288,15 +288,16 @@ export default defineConfig([
   },
 
   {
-    // Tool config files (vite, prettier, eslint) are loaded through their default
-    // export, typically `export default defineConfig(...)`.
-    files: ['*.config.{js,ts}'],
+    // Tool config files (vite, prettier, eslint, dependency-cruiser, ...) are loaded
+    // through their default export, typically `export default defineConfig(...)`.
+    files: ['*.config.{js,ts}', '.dependency-cruiser.js'],
     rules: {
       // Allow the default export these tools require
       'no-restricted-syntax': 'off',
       // A factory call at module level is the intended pattern here, not a side effect
       'unicorn/no-top-level-side-effects': 'off',
-      // File names are dictated by the tools that look them up (`lint-staged.config.js`)
+      // File names are dictated by the tools that look them up (`lint-staged.config.js`,
+      // `.dependency-cruiser.js`)
       'unicorn/filename-case': 'off',
     },
   },
