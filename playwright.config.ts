@@ -1,7 +1,11 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 4173
-const BASE_URL = `http://localhost:${String(PORT)}`
+const LOCAL_URL = `http://localhost:${String(PORT)}`
+
+// When BASE_URL is set (e.g. by the container setup), the tests run against that
+// already running server. Otherwise Playwright builds and serves the app itself.
+const externalBaseUrl = process.env.BASE_URL
 
 export default defineConfig({
   testDir: './e2e',
@@ -11,15 +15,17 @@ export default defineConfig({
   forbidOnly: process.env.CI !== undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: BASE_URL,
+    baseURL: externalBaseUrl ?? LOCAL_URL,
     trace: 'retain-on-failure',
   },
   // Tests run against the production build, not the dev server: that's what users get
-  webServer: {
-    command: `pnpm build && pnpm preview --port ${String(PORT)} --strictPort`,
-    url: BASE_URL,
-    reuseExistingServer: process.env.CI === undefined,
-  },
+  ...(externalBaseUrl === undefined && {
+    webServer: {
+      command: `pnpm build && pnpm preview --port ${String(PORT)} --strictPort`,
+      url: LOCAL_URL,
+      reuseExistingServer: process.env.CI === undefined,
+    },
+  }),
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },

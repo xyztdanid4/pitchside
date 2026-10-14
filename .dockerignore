@@ -1,0 +1,16 @@
+# Installed and built inside the image
+node_modules
+dist
+
+# Local output and tooling state
+coverage
+playwright-report
+test-results
+blob-report
+.lighthouseci
+.git
+.husky/_
+
+# Local notes, not part of the project
+TODO.md
+DECISIONS.md

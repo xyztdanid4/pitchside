@@ -1,0 +1,34 @@
+# Works with both Docker (`docker compose ...`) and Podman (`podman compose ...`).
+#   Run the app:       compose up web               -> http://localhost:8080
+#   Run the e2e tests: compose run --rm e2e
+name: pitchside
+
+services:
+  # Not named `app`: `.app` is a top-level domain on Chrome's HSTS preload list, so
+  # Chromium would force `http://app:8080` to HTTPS and the e2e tests couldn't connect.
+  web:
+    build:
+      context: .
+      target: web
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--spider', 'http://localhost:8080/']
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  e2e:
+    build:
+      context: .
+      target: e2e
+    environment:
+      # Test the `web` container instead of starting a server inside this one
+      BASE_URL: http://web:8080
+      CI: 'true'
+    depends_on:
+      web:
+        condition: service_healthy
+    # Only started explicitly (`compose run e2e`), not by `compose up`
+    profiles:
+      - test

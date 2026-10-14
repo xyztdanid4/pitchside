@@ -5,6 +5,8 @@ built with React and TypeScript.
 
 ## Getting started
 
+### Locally
+
 Requires Node.js 22.22.2+ or 24.15+ (24 recommended, see `.nvmrc`) and pnpm 10. The versions
 are enforced: installing with an unsupported Node.js version or with npm fails.
 
@@ -15,6 +17,16 @@ pnpm dev
 
 Use `pnpm exec` (or `pnpm dlx`) instead of `npx`: `npx` runs through npm, which the
 project's package manager check rejects.
+
+### With Docker or Podman
+
+No Node.js or pnpm needed, only Docker or Podman. Both read the same `compose.yaml`:
+
+```bash
+docker compose up web     # or: podman compose up web
+```
+
+This builds the production version and serves it at <http://localhost:8080>.
 
 ## Scripts
 
@@ -63,6 +75,14 @@ Playwright uses its own Chromium build (about 120 MB, stored in the user cache).
 ```bash
 pnpm test:e2e
 ```
+
+Or in a container, on any operating system, without installing a browser:
+
+```bash
+docker compose run --rm e2e     # or: podman compose run --rm e2e
+```
+
+This runs the tests in Playwright's official image against the `web` container.
 
 This builds the app, serves it with `vite preview` and runs the tests. An HTML report is written to
 `playwright-report/`, with traces of failed tests (`pnpm exec playwright show-report`).
