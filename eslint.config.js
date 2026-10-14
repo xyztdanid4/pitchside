@@ -1,10 +1,13 @@
 import eslintReact from '@eslint-react/eslint-plugin'
 import js from '@eslint/js'
+import vitest from '@vitest/eslint-plugin'
 import eslintConfigPrettier from 'eslint-config-prettier/flat'
+import jestDom from 'eslint-plugin-jest-dom'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 import perfectionist from 'eslint-plugin-perfectionist'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import testingLibrary from 'eslint-plugin-testing-library'
 import unicorn from 'eslint-plugin-unicorn'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
@@ -226,6 +229,39 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+  },
+
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    extends: [
+      vitest.configs.recommended,
+      testingLibrary.configs['flat/react'],
+      jestDom.configs['flat/recommended'],
+    ],
+    rules: {
+      // Every test must assert something. Helpers that call `expect` internally are
+      // registered here so tests using only them still count as asserting.
+      'vitest/expect-expect': [
+        'error',
+        { assertFunctionNames: ['expect', 'expectNoAxeViolations'] },
+      ],
+
+      // One spelling for test cases: `it(...)`, never mixed with `test(...)`
+      'vitest/consistent-test-it': ['error', { fn: 'it', withinDescribe: 'it' }],
+
+      // `.only` and `.skip` must never be committed: `.only` silently disables every
+      // other test in the file, `.skip` hides a test that should be fixed or deleted.
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-disabled-tests': 'error',
+
+      // `toStrictEqual` instead of `toEqual`: it also checks `undefined` properties
+      // and class types, so `{ a: 1 }` doesn't match `{ a: 1, b: undefined }`.
+      'vitest/prefer-strict-equal': 'error',
+
+      // Every test file groups its tests in a top-level `describe` block, so test
+      // output reads as "<unit> > <behaviour>".
+      'vitest/require-top-level-describe': 'error',
     },
   },
 
