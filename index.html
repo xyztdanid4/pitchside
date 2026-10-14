@@ -8,10 +8,44 @@
       name="description"
       content="Football competition standings: league table with points, goal difference and form."
     />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Theme -->
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#15803d" />
+
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Only applies when JavaScript is disabled -->
+    <noscript>
+      <style>
+        .noscript {
+          display: grid;
+          justify-items: center;
+          gap: 0.5rem;
+          max-width: 28rem;
+          margin: 4rem auto;
+          padding: 2rem 1rem;
+          text-align: center;
+        }
+        .noscript h1 {
+          margin: 0;
+        }
+        .noscript p {
+          margin: 0;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
-    <noscript>Pitchside needs JavaScript to display the standings.</noscript>
+    <noscript>
+      <div class="noscript">
+        <img src="/favicon.svg" alt="" width="64" height="64" />
+        <h1>Pitchside</h1>
+        <p>Enable JavaScript to see the Premier Division standings.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
