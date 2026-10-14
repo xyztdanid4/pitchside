@@ -6,6 +6,7 @@ import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import jestDom from 'eslint-plugin-jest-dom'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 import perfectionist from 'eslint-plugin-perfectionist'
+import playwright from 'eslint-plugin-playwright'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import testingLibrary from 'eslint-plugin-testing-library'
@@ -307,6 +308,27 @@ export default defineConfig([
       // Every test file groups its tests in a top-level `describe` block, so test
       // output reads as "<unit> > <behaviour>".
       'vitest/require-top-level-describe': 'error',
+    },
+  },
+
+  {
+    files: ['e2e/**/*.ts'],
+    extends: [playwright.configs['flat/recommended']],
+    rules: {
+      // Every test must assert something; `expect` covers Playwright's web-first
+      // assertions (`toBeVisible`, ...) as well
+      'playwright/expect-expect': 'error',
+      // `.only` must never be committed: it silently disables every other test
+      'playwright/no-focused-test': 'error',
+      // `.skip` hides a test that should be fixed or deleted
+      'playwright/no-skipped-test': 'error',
+      // `toStrictEqual` instead of `toEqual`, as in the unit tests
+      'playwright/prefer-strict-equal': 'error',
+      // Web-first assertions retry until the page settles; reading a value and
+      // asserting on it once doesn't, which makes tests flaky.
+      //   ✗ expect(await heading.isVisible()).toBe(true)
+      //   ✓ await expect(heading).toBeVisible()
+      'playwright/prefer-web-first-assertions': 'error',
     },
   },
 
