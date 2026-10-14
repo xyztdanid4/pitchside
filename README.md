@@ -5,12 +5,16 @@ built with React and TypeScript.
 
 ## Getting started
 
-Requires Node.js 22+ and pnpm.
+Requires Node.js 22.22.2+ or 24.15+ (24 recommended, see `.nvmrc`) and pnpm 10. The versions
+are enforced: installing with an unsupported Node.js version or with npm fails.
 
 ```bash
 pnpm install
 pnpm dev
 ```
+
+Use `pnpm exec` (or `pnpm dlx`) instead of `npx`: `npx` runs through npm, which the
+project's package manager check rejects.
 
 ## Scripts
 
