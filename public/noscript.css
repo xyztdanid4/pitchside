@@ -1,0 +1,15 @@
+/* Styles for the message shown when JavaScript is disabled (see index.html) */
+.noscript {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  max-inline-size: 28rem;
+  padding: 2rem 1rem;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.noscript h1,
+.noscript p {
+  margin: 0;
+}

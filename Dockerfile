@@ -22,6 +22,8 @@ RUN pnpm build
 
 # --- web: static files served by an unprivileged nginx (listens on 8080, not as root) ----------
 FROM docker.io/nginxinc/nginx-unprivileged:1.29-alpine AS web
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 8080
 

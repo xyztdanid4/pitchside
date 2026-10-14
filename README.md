@@ -23,7 +23,7 @@ project's package manager check rejects.
 No Node.js or pnpm needed, only Docker or Podman. Both read the same `compose.yaml`:
 
 ```bash
-docker compose up web     # or: podman compose up web
+docker compose up --build web     # or: podman compose up --build web
 ```
 
 This builds the production version and serves it at <http://localhost:8080>.
@@ -79,7 +79,7 @@ pnpm test:e2e
 Or in a container, on any operating system, without installing a browser:
 
 ```bash
-docker compose run --rm e2e     # or: podman compose run --rm e2e
+docker compose run --rm --build e2e     # or: podman compose run --rm --build e2e
 ```
 
 This runs the tests in Playwright's official image against the `web` container.

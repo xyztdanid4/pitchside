@@ -17,26 +17,9 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- Only applies when JavaScript is disabled -->
-    <noscript>
-      <style>
-        .noscript {
-          display: grid;
-          justify-items: center;
-          gap: 0.5rem;
-          max-width: 28rem;
-          margin: 4rem auto;
-          padding: 2rem 1rem;
-          text-align: center;
-        }
-        .noscript h1 {
-          margin: 0;
-        }
-        .noscript p {
-          margin: 0;
-        }
-      </style>
-    </noscript>
+    <!-- Only loaded when JavaScript is disabled. A file, not an inline <style>, so the
+         Content-Security-Policy can forbid inline styles. -->
+    <noscript><link rel="stylesheet" href="/noscript.css" /></noscript>
   </head>
   <body class="bg-surface text-foreground antialiased">
     <noscript>

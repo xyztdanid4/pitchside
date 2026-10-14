@@ -1,6 +1,7 @@
 # Works with both Docker (`docker compose ...`) and Podman (`podman compose ...`).
-#   Run the app:       compose up web               -> http://localhost:8080
-#   Run the e2e tests: compose run --rm e2e
+#   Run the app:       compose up --build web       -> http://localhost:8080
+#   Run the e2e tests: compose run --rm --build e2e
+# `--build` rebuilds the images; without it, an existing image is reused even if the code changed.
 name: pitchside
 
 services:
