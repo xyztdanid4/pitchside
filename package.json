@@ -2,8 +2,29 @@
   "name": "pitchside",
   "private": true,
   "version": "0.0.0",
+  "description": "Football competition standings — React + TypeScript",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xyztdanid4/pitchside.git"
+  },
   "type": "module",
   "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^10",
+      "onFail": "error"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
