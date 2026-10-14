@@ -21,3 +21,5 @@ pnpm dev
 | `pnpm preview` | Preview the production build |
 | `pnpm typecheck` | Run the TypeScript compiler |
 | `pnpm lint` | Run ESLint |
+| `pnpm format` | Format all files with Prettier |
+| `pnpm format:check` | Check formatting without writing |
