@@ -48,6 +48,36 @@ export default {
     //   ✗ color: red;          ✓ color: #dc2626;
     'color-named': 'never',
 
+    // Tailwind v4 is configured in CSS with its own at-rules (`@theme`, `@utility`,
+    // `@custom-variant`, ...), which plain CSS doesn't know.
+    'at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: [
+          'theme',
+          'source',
+          'utility',
+          'variant',
+          'custom-variant',
+          'apply',
+          'reference',
+          'plugin',
+          'config',
+        ],
+      },
+    ],
+
+    // Tailwind is imported as a package name (`@import 'tailwindcss'`), which the
+    // `url(...)` notation doesn't support.
+    'import-notation': 'string',
+
+    // Custom properties are kebab-case. A trailing `-*` is also allowed: Tailwind
+    // uses it in `@theme` to reset a whole namespace (`--color-*: initial`).
+    'custom-property-pattern': [
+      String.raw`^([a-z][a-z0-9]*)(-[a-z0-9]+)*(-\*)?$`,
+      { message: 'Expected custom property name to be kebab-case' },
+    ],
+
     // Turned off: `display: none` is the correct way to remove content from both
     // the screen and the accessibility tree (e.g. a closed menu). The rule flags
     // every use, so it gives no signal.

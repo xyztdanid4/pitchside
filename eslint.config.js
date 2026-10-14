@@ -2,6 +2,7 @@ import eslintReact from '@eslint-react/eslint-plugin'
 import js from '@eslint/js'
 import vitest from '@vitest/eslint-plugin'
 import eslintConfigPrettier from 'eslint-config-prettier/flat'
+import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import jestDom from 'eslint-plugin-jest-dom'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 import perfectionist from 'eslint-plugin-perfectionist'
@@ -248,9 +249,31 @@ export default defineConfig([
       reactHooks.configs.flat['recommended-latest'],
       reactRefresh.configs.vite,
       jsxA11y.flatConfigs.strict,
+      // Tailwind class correctness: unknown, conflicting, duplicate and deprecated
+      // classes. Class order and line wrapping are left to Prettier.
+      betterTailwindcss.configs['correctness-error'],
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+    settings: {
+      'better-tailwindcss': {
+        // The stylesheet that defines which classes exist
+        entryPoint: 'src/index.css',
+      },
+    },
+    rules: {
+      // Canonical, shortest spelling of a class: `size-4` instead of `w-4 h-4`
+      'better-tailwindcss/enforce-canonical-classes': 'error',
+      // Direction-dependent classes use logical properties (`ms-4`, `pe-2`, `text-start`)
+      // instead of physical ones (`ml-4`, `pr-2`, `text-left`), so spacing and
+      // alignment follow the reading direction in right-to-left languages too.
+      // Sizes are exempt: `w-*` / `h-*` read more clearly than `inline-*` / `block-*`
+      // and don't depend on reading direction in horizontal writing modes.
+      'better-tailwindcss/enforce-logical-properties': [
+        'error',
+        { ignore: ['(^|:)(min-|max-)?[wh]-', '(^|:)size-'] },
+      ],
     },
   },
 

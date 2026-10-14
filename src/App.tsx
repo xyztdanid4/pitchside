@@ -1,7 +1,7 @@
 export function App() {
   return (
-    <main>
-      <h1>Pitchside</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-2xl font-bold text-brand">Pitchside</h1>
     </main>
   )
 }
