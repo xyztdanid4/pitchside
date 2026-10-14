@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# pnpm's package store, if a tool ever creates it inside the project
+.pnpm-store
 dist
 dist-ssr
 *.local

@@ -1,0 +1,53 @@
+// A ready-to-use development environment for VS Code (Dev Containers extension),
+// JetBrains IDEs and GitHub Codespaces: Node.js 24, pnpm and the Playwright browser,
+// with the project's editor extensions.
+{
+  "name": "Pitchside",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+
+  // node_modules lives in a volume, not in the mounted project folder: dependencies
+  // installed on the host and in the container never overwrite each other
+  "mounts": [
+    "source=pitchside-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  // Keep pnpm's package store in the container's home. Because node_modules is on a
+  // different volume, pnpm would otherwise create the store inside the project folder.
+  "containerEnv": {
+    "npm_config_store_dir": "/home/node/.local/share/pnpm/store"
+  },
+
+  // Runs once after the container is created: sets up pnpm, installs dependencies
+  // and the Playwright browser (see the script for details)
+  "postCreateCommand": ".devcontainer/post-create.sh",
+
+  // Vite dev server and `vite preview`
+  "forwardPorts": [5173, 4173],
+  "portsAttributes": {
+    "5173": { "label": "Dev server", "onAutoForward": "openBrowser" },
+    "4173": { "label": "Preview", "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "stylelint.vscode-stylelint",
+        "bradlc.vscode-tailwindcss",
+        "editorconfig.editorconfig",
+        "vitest.explorer",
+        "ms-playwright.playwright"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit",
+          "source.fixAll.stylelint": "explicit"
+        },
+        "stylelint.validate": ["css"],
+        "css.validate": false
+      }
+    }
+  }
+}

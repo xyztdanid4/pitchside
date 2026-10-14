@@ -28,6 +28,17 @@ docker compose up --build web     # or: podman compose up --build web
 
 This builds the production version and serves it at <http://localhost:8080>.
 
+### In a Dev Container
+
+A complete development environment (Node.js, pnpm, the Playwright browser and the editor
+extensions) defined in `.devcontainer/`:
+
+- **VS Code:** install the Dev Containers extension, then run _Dev Containers: Reopen in Container_.
+- **JetBrains IDEs:** open `.devcontainer/devcontainer.json` and choose _Create Dev Container_.
+- **GitHub Codespaces:** _Code_ → _Codespaces_ → _Create codespace_. Nothing to install locally.
+
+Dependencies are installed automatically; run `pnpm dev` inside the container.
+
 ## Scripts
 
 | Command                 | Description                                                    |
