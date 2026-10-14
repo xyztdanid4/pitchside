@@ -296,6 +296,8 @@ export default defineConfig([
       'no-restricted-syntax': 'off',
       // A factory call at module level is the intended pattern here, not a side effect
       'unicorn/no-top-level-side-effects': 'off',
+      // File names are dictated by the tools that look them up (`lint-staged.config.js`)
+      'unicorn/filename-case': 'off',
     },
   },
 

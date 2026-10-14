@@ -27,3 +27,15 @@ pnpm dev
 | `pnpm lint:css`      | Run Stylelint                       |
 | `pnpm format`        | Format all files with Prettier      |
 | `pnpm format:check`  | Check formatting without writing    |
+
+## Git hooks
+
+Installed automatically by `pnpm install` (Husky):
+
+| Hook         | Runs                                                         |
+| ------------ | ------------------------------------------------------------ |
+| `pre-commit` | ESLint, Stylelint and Prettier on staged files (lint-staged) |
+| `commit-msg` | commitlint: messages follow [Conventional Commits][cc]       |
+| `pre-push`   | Type check and tests                                         |
+
+[cc]: https://www.conventionalcommits.org/
