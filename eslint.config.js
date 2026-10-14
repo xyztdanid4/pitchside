@@ -206,6 +206,13 @@ export default defineConfig([
       // which uses type information and so doesn't flag string arrays, where the
       // default sort is correct. Keeping both would report every `.sort()` twice.
       'unicorn/require-array-sort-compare': 'off',
+
+      // Turned off: the rule removes the leading ` * ` from JSDoc lines, but that
+      // prefix is the standard JSDoc format that editors generate and expect.
+      //   ✓ /**
+      //      * @type {import('stylelint').Config}
+      //      */
+      'unicorn/no-asterisk-prefix-in-documentation-comments': 'off',
     },
   },
 
