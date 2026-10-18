@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    // Resolve the `@/*` alias from the `paths` in tsconfig.app.json
+    // Resolve the `@/*` and `@public/*` aliases from the `paths` in tsconfig.app.json
     tsconfigPaths: true,
   },
   test: {
@@ -15,6 +15,8 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     // Every test starts from clean mocks, no state leaks between tests
     restoreMocks: true,
+    // ...and from the real globals: `vi.stubGlobal('fetch', ...)` is undone after each test
+    unstubGlobals: true,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],

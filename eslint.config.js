@@ -286,11 +286,11 @@ export default defineConfig([
       jestDom.configs['flat/recommended'],
     ],
     rules: {
-      // Every test must assert something. Helpers that call `expect` internally are
-      // registered here so tests using only them still count as asserting.
+      // Every test must assert something. Helpers that call `expect` internally, and
+      // compile-time `expectTypeOf` checks, are registered here so they count as assertions.
       'vitest/expect-expect': [
         'error',
-        { assertFunctionNames: ['expect', 'expectNoAxeViolations'] },
+        { assertFunctionNames: ['expect', 'expectTypeOf', 'expectNoAxeViolations'] },
       ],
 
       // One spelling for test cases: `it(...)`, never mixed with `test(...)`

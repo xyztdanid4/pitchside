@@ -70,6 +70,34 @@ export default {
         path: [String.raw`\.test\.tsx?$`, '^src/test/'],
       },
     },
+    // Layers. Football code lives in standings/ (model -> api), generic code in shared/.
+    // Tests may cross these lines: they use the real competition data.
+    {
+      // Shared code works for any data, so it can't know the league table.
+      // The question "does it know about football?" decides where code goes.
+      name: 'shared-knows-no-football',
+      severity: 'error',
+      from: {
+        path: '^src/shared/',
+        pathNot: String.raw`\.test\.tsx?$`,
+      },
+      to: {
+        path: '^src/standings/',
+      },
+    },
+    {
+      // The model is plain football logic: no React, no other layers, no packages.
+      // That keeps it testable on its own and movable (e.g. to a server).
+      name: 'model-is-pure',
+      severity: 'error',
+      from: {
+        path: '^src/standings/model/',
+        pathNot: String.raw`\.test\.tsx?$`,
+      },
+      to: {
+        pathNot: '^src/standings/model/',
+      },
+    },
   ],
 
   options: {
