@@ -13,13 +13,26 @@
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
+  --color-tone-positive: var(--tone-positive);
+  --color-tone-negative: var(--tone-negative);
+  --color-champion-mark: var(--champion-mark);
+  --color-relegation-mark: var(--relegation-mark);
 }
 
-/* Light theme. Text colors meet WCAG AA contrast (4.5:1) on `--surface`. */
+/* Light theme. Text colors meet WCAG AA contrast (4.5:1) on the backgrounds they sit on. */
 :root {
   --surface: #fff;
   --foreground: #0f172a;
   --brand: #15803d;
+
+  /* Highlighted table rows: opaque tints, since sticky cells must hide what scrolls
+     under them */
+  --tone-positive: #e9f6ee;
+  --tone-negative: #fbeceb;
+
+  /* Zone marks: the stronger color for the dot at the position and the legend */
+  --champion-mark: #166534;
+  --relegation-mark: #b42318;
 
   color-scheme: light dark;
 }
@@ -30,5 +43,9 @@
     --surface: #0f1712;
     --foreground: #e6efe9;
     --brand: #4ade80;
+    --tone-positive: #12291b;
+    --tone-negative: #2c1615;
+    --champion-mark: #4ade80;
+    --relegation-mark: #f87171;
   }
 }

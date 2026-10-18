@@ -32,6 +32,8 @@ function tableParts(page: Page) {
       .getByRole('cell')
       .first(),
     leaderClub: page.getByRole('rowheader', { name: 'Glenhaven City' }),
+    midTableClub: page.getByRole('rowheader', { name: 'Dunwich Town' }),
+    lastClub: page.getByRole('rowheader', { name: 'Highmoor Athletic' }),
   }
 }
 
@@ -159,8 +161,16 @@ test.describe('standings table', () => {
       await page.emulateMedia({ colorScheme })
       const parts = tableParts(page)
 
-      // rgb(...) has no alpha channel; rgba(...) would let the content through
-      for (const cell of [parts.positionHeader, parts.clubHeader, parts.leaderClub]) {
+      // rgb(...) has no alpha channel; rgba(...) would let the content through. The rows
+      // cover all three backgrounds: champion (positive tone), mid-table (none) and
+      // relegation (negative tone).
+      for (const cell of [
+        parts.positionHeader,
+        parts.clubHeader,
+        parts.leaderClub,
+        parts.midTableClub,
+        parts.lastClub,
+      ]) {
         await expect(cell).toHaveCSS('background-color', /^rgb\(/)
       }
     })

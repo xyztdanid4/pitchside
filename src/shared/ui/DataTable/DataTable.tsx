@@ -1,12 +1,21 @@
 import { useId } from 'react'
 
 import type { Column } from '@/shared/ui/DataTable/column.ts'
+import type { RowTone } from '@/shared/ui/DataTable/rowTone.ts'
+
+import { ROW_TONE_CLASS } from '@/shared/ui/DataTable/rowTone.ts'
 
 type DataTableProperties<Row> = {
   readonly caption: string
   readonly columns: readonly Column<Row>[]
   readonly rows: readonly Row[]
   readonly rowKey: (row: Row) => string
+  // Highlights a row; rows without a tone get the plain surface
+  readonly rowTone?: (row: Row) => RowTone | undefined
+}
+
+function rowBackground(tone: RowTone | undefined): string {
+  return tone === undefined ? 'bg-surface' : ROW_TONE_CLASS[tone]
 }
 
 // The bottom border sits on the cells: rows can't have borders in the separate border model.
@@ -28,7 +37,13 @@ function cellClassOf<Row>(column: Column<Row>): string {
  * The table scrolls inside its own region: the header row stays at the top and
  * pinned columns stay at the start while the rest moves.
  */
-export function DataTable<Row>({ caption, columns, rows, rowKey }: DataTableProperties<Row>) {
+export function DataTable<Row>({
+  caption,
+  columns,
+  rows,
+  rowKey,
+  rowTone,
+}: DataTableProperties<Row>) {
   const captionId = useId()
 
   return (
@@ -69,7 +84,7 @@ export function DataTable<Row>({ caption, columns, rows, rowKey }: DataTableProp
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={rowKey(row)} className="bg-surface">
+            <tr key={rowKey(row)} className={rowBackground(rowTone?.(row))}>
               {columns.map((column) => {
                 // Cells take the row's opaque background. Pinned cells stick, above the
                 // cells that scroll under them.

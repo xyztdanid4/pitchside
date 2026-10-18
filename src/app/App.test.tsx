@@ -58,7 +58,33 @@ describe('App', () => {
     const numbers = within(leaderRow)
       .getAllByRole('cell')
       .map((cell) => cell.textContent)
-    expect(numbers).toStrictEqual(['1', '3', '2', '0', '1', '5', '3', '+2', '6'])
+    expect(numbers).toStrictEqual(['1, Champion', '3', '2', '0', '1', '5', '3', '+2', '6'])
+  })
+
+  // The tint alone would rely on color, so the zone is also in the text and the legend
+  it('marks the champion and the bottom three as relegated, in words', async () => {
+    await renderLoadedApp()
+
+    const firstCells = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map((row) => within(row).getAllByRole('cell')[0]?.textContent)
+    expect(firstCells).toStrictEqual([
+      '1, Champion',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6, Relegation',
+      '7, Relegation',
+      '8, Relegation',
+    ])
+    const legend = screen.getByRole('list', { name: 'Zones' })
+    expect(
+      within(legend)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toStrictEqual(['Champion: Position 1', 'Relegation: Positions 6–8'])
   })
 
   // The headers show short labels (P, W, GD, ...), but screen readers get the full names

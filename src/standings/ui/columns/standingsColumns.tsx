@@ -1,17 +1,28 @@
 import type { Column } from '@/shared/ui/DataTable/index.ts'
-import type { StandingRow } from '@/standings/model/calculateStandings.ts'
+import type { TableRow } from '@/standings/ui/zones/withZones.ts'
 
 import { formatGoalDifference } from '@/standings/ui/columns/formatGoalDifference.ts'
 import { numberColumn } from '@/standings/ui/columns/numberColumn.tsx'
 import { ShortHeader } from '@/standings/ui/columns/ShortHeader.tsx'
+import { ZONE_LABEL, ZONE_MARK_CLASS } from '@/standings/ui/zones/zoneStyles.ts'
 
 // The columns of the league table, in the order of the mockup. Position and Club stay
 // in view while the numbers scroll sideways.
-export const standingsColumns: readonly Column<StandingRow>[] = [
+export const standingsColumns: readonly Column<TableRow>[] = [
   {
     key: 'position',
     header: <ShortHeader short="Pos" full="Position" alwaysShort />,
-    cell: (row) => row.position,
+    // The row tint and the dot show the zone; screen readers hear it with the position
+    cell: (row) => (
+      <span className="inline-flex items-center gap-1.5">
+        <span
+          aria-hidden="true"
+          className={`size-1.5 rounded-full ${row.zone === null ? '' : ZONE_MARK_CLASS[row.zone]}`}
+        />
+        {row.position}
+        {row.zone !== null && <span className="sr-only">, {ZONE_LABEL[row.zone]}</span>}
+      </span>
+    ),
     pinned: true,
     // A fixed width in rem, so it grows with the text size
     className: 'inset-s-0 w-14 min-w-14',

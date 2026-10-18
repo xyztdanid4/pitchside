@@ -1,20 +1,28 @@
 import { useMemo } from 'react'
 
-import type { StandingRow } from '@/standings/model/calculateStandings.ts'
+import type { RowTone } from '@/shared/ui/DataTable/index.ts'
 import type { CompetitionData } from '@/standings/model/competition.ts'
+import type { TableRow } from '@/standings/ui/zones/withZones.ts'
 
 import { DataTable } from '@/shared/ui/DataTable/index.ts'
 import { StatusMessage } from '@/shared/ui/StatusMessage/index.ts'
 import { calculateStandings } from '@/standings/model/calculateStandings.ts'
 import { standingsColumns } from '@/standings/ui/columns/standingsColumns.tsx'
+import { withZones } from '@/standings/ui/zones/withZones.ts'
+import { ZoneLegend } from '@/standings/ui/zones/ZoneLegend.tsx'
+import { ZONE_TONE } from '@/standings/ui/zones/zoneStyles.ts'
 
-function teamIdOf(row: StandingRow): string {
+function teamIdOf(row: TableRow): string {
   return row.team.id
+}
+
+function zoneToneOf(row: TableRow): RowTone | undefined {
+  return row.zone === null ? undefined : ZONE_TONE[row.zone]
 }
 
 export function StandingsTable({ competition }: { readonly competition: CompetitionData }) {
   // Derived from the loaded data, never stored, so it can't get out of step with it
-  const rows = useMemo(() => calculateStandings(competition), [competition])
+  const rows = useMemo(() => withZones(calculateStandings(competition)), [competition])
 
   if (rows.length === 0) {
     return <StatusMessage kind="info" message="No teams in this competition yet." />
@@ -33,7 +41,9 @@ export function StandingsTable({ competition }: { readonly competition: Competit
         columns={standingsColumns}
         rows={rows}
         rowKey={teamIdOf}
+        rowTone={zoneToneOf}
       />
+      <ZoneLegend rows={rows} />
     </div>
   )
 }
