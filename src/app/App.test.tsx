@@ -55,10 +55,16 @@ describe('App', () => {
     await renderLoadedApp()
 
     const leaderRow = screen.getByRole('row', { name: /Glenhaven City/ })
-    const numbers = within(leaderRow)
-      .getAllByRole('cell')
-      .map((cell) => cell.textContent)
+    const cells = within(leaderRow).getAllByRole('cell')
+    const numbers = cells.slice(0, -1).map((cell) => cell.textContent)
     expect(numbers).toStrictEqual(['1, Champion', '3', '2', '0', '1', '5', '3', '+2', '6'])
+    // Glenhaven City won, won, then lost: shown most recent first
+    const form = within(leaderRow).getByRole('list', { name: 'Most recent first' })
+    expect(
+      within(form)
+        .getAllByText(/^(Win|Draw|Loss)$/)
+        .map((chip) => chip.textContent),
+    ).toStrictEqual(['Loss', 'Win', 'Win'])
   })
 
   // The tint alone would rely on color, so the zone is also in the text and the legend
@@ -102,6 +108,7 @@ describe('App', () => {
       'Goals against',
       'Goal difference',
       'Points',
+      'Last 5',
     ]
     // Finding each header by its accessible name, in order, checks names and order at once
     const headersByName = fullNames.map((name) => screen.getByRole('columnheader', { name }))

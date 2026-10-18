@@ -4,6 +4,7 @@ import type { TableRow } from '@/standings/ui/zones/withZones.ts'
 import { formatGoalDifference } from '@/standings/ui/columns/formatGoalDifference.ts'
 import { numberColumn } from '@/standings/ui/columns/numberColumn.tsx'
 import { ShortHeader } from '@/standings/ui/columns/ShortHeader.tsx'
+import { FormResults } from '@/standings/ui/form/FormResults.tsx'
 import { ZONE_LABEL, ZONE_MARK_CLASS } from '@/standings/ui/zones/zoneStyles.ts'
 
 // The columns of the league table, in the order of the mockup. Position and Club stay
@@ -75,4 +76,5 @@ export const standingsColumns: readonly Column<TableRow>[] = [
     cell: (row) => <span className="font-condensed text-lg font-bold">{row.points}</span>,
     align: 'center',
   },
+  { key: 'form', header: 'Last 5', cell: (row) => <FormResults results={row.form} /> },
 ]

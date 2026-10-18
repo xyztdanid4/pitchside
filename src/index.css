@@ -23,6 +23,12 @@
   --color-tone-negative: var(--tone-negative);
   --color-champion-mark: var(--champion-mark);
   --color-relegation-mark: var(--relegation-mark);
+  --color-win: var(--win);
+  --color-on-win: var(--on-win);
+  --color-draw: var(--draw);
+  --color-on-draw: var(--on-draw);
+  --color-loss: var(--loss);
+  --color-on-loss: var(--on-loss);
 
   /* Self-hosted (see main.tsx): Barlow for text, Barlow Condensed for headings and numbers */
   --font-sans: 'Barlow', system-ui, sans-serif;
@@ -52,6 +58,14 @@
   --champion-mark: #166534;
   --relegation-mark: #b42318;
 
+  /* Form chips */
+  --win: #15803d;
+  --on-win: #fff;
+  --draw: #5f6b66;
+  --on-draw: #fff;
+  --loss: #b42318;
+  --on-loss: #fff;
+
   color-scheme: light dark;
 }
 
@@ -71,5 +85,11 @@
     --tone-negative: #2c1615;
     --champion-mark: #4ade80;
     --relegation-mark: #f87171;
+    --win: #4ade80;
+    --on-win: #052e16;
+    --draw: #a3b1aa;
+    --on-draw: #111614;
+    --loss: #f87171;
+    --on-loss: #2a0606;
   }
 }
