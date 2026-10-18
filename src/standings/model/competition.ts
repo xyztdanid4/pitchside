@@ -1,6 +1,6 @@
-type TeamId = string
+export type TeamId = string
 
-type Team = {
+export type Team = {
   readonly id: TeamId
   readonly name: string
 }
