@@ -41,8 +41,9 @@ export function DataTable<Row>({ caption, columns, rows, rowKey }: DataTableProp
       // Scrolls vertically once its parent limits its height (`min-h-0` lets it shrink in
       // a flex column). `relative`: absolutely positioned content (the visually hidden
       // labels) is placed and clipped inside the region; otherwise it would stretch the
-      // page sideways.
-      className="relative min-h-0 overflow-auto"
+      // page sideways. `@container`: cells can adapt to the table's width (container
+      // queries), whatever the screen size.
+      className="@container relative min-h-0 overflow-auto"
     >
       {/* `border-separate`: with collapsed borders, sticky cells leave their borders behind.
           At least as wide as the region, wider when the columns need it. */}

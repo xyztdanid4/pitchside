@@ -64,6 +64,24 @@ test.describe('standings table', () => {
     expect(overflow).toBe(0)
   })
 
+  // Narrow tables get short labels; the full names show once the table has room for them
+  test('shows the full column names on a wide screen', async ({ page }) => {
+    await expect(page.getByText('GD', { exact: true })).toBeVisible()
+
+    await page.setViewportSize({ width: 1280, height: 800 })
+
+    await expect(page.getByText('GD', { exact: true })).toBeHidden()
+    const fullName = await box(page.getByText('Goal difference', { exact: true }))
+    expect(fullName.width).toBeGreaterThan(40)
+    // Position is pinned with a fixed width, so it keeps its short label
+    await expect(page.getByText('Pos', { exact: true })).toBeVisible()
+    // ...and the table still fits without scrolling sideways
+    const overflow = await tableParts(page).region.evaluate(
+      (region) => region.scrollWidth - region.clientWidth,
+    )
+    expect(overflow).toBe(0)
+  })
+
   // One scroll area: the page is exactly the screen's height and only the table scrolls,
   // so a phone never has a scroll area inside a scrolling page
   test('scrolls only the table, not the page', async ({ page }) => {
@@ -145,6 +163,70 @@ test.describe('standings table', () => {
       for (const cell of [parts.positionHeader, parts.clubHeader, parts.leaderClub]) {
         await expect(cell).toHaveCSS('background-color', /^rgb\(/)
       }
+    })
+  }
+})
+
+// The longest and largest the table should handle: 20 clubs with long names and a full
+// season (every club plays every other twice), so the numbers have 2 or 3 characters.
+// Built from the real fixture's clubs; the extra 12 are their reserve and academy sides.
+type Club = { readonly id: string; readonly name: string }
+
+function fullSeason(clubs: readonly Club[]) {
+  return clubs
+    .flatMap((home, homeIndex) =>
+      clubs
+        .filter((away) => away !== home)
+        .map((away, awayIndex) => ({
+          homeTeamId: home.id,
+          awayTeamId: away.id,
+          homeScore: (homeIndex * 7 + awayIndex * 3) % 6,
+          awayScore: (homeIndex * 5 + awayIndex) % 4,
+          status: 'completed',
+        })),
+    )
+    .map((match, index) => ({ id: `m${String(index + 1)}`, ...match }))
+}
+
+test.describe('standings table with a full 20-club season', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/data/premier-division.json', async (route) => {
+      const response = await route.fetch()
+      const fixture = (await response.json()) as { teams: Club[] }
+      const clubs = [
+        ...fixture.teams,
+        ...fixture.teams.map((club) => ({
+          id: `${club.id}-reserves`,
+          name: `${club.name} Reserves`,
+        })),
+        ...fixture.teams
+          .slice(0, 4)
+          .map((club) => ({ id: `${club.id}-academy`, name: `${club.name} Academy` })),
+      ]
+      await route.fulfill({
+        response,
+        json: { ...fixture, teams: clubs, matches: fullSeason(clubs) },
+      })
+    })
+  })
+
+  // The table's width doesn't depend on the data: club names are cut off and numbers have
+  // at most 3 characters. So the threshold for full names holds for any season.
+  for (const { width, fullNames } of [
+    { width: 1024, fullNames: false },
+    { width: 1280, fullNames: true },
+    { width: 1440, fullNames: true },
+  ]) {
+    test(`fits a ${String(width)} px screen without scrolling sideways`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 })
+      await page.goto('/')
+      const { region } = tableParts(page)
+      await expect(page.getByRole('row')).toHaveCount(21)
+
+      const overflow = await region.evaluate((element) => element.scrollWidth - element.clientWidth)
+      expect(overflow).toBe(0)
+      // Short labels below the threshold, full names above it
+      await expect(page.getByText('GD', { exact: true })).toBeVisible({ visible: !fullNames })
     })
   }
 })

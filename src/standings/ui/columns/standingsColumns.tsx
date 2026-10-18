@@ -10,7 +10,7 @@ import { ShortHeader } from '@/standings/ui/columns/ShortHeader.tsx'
 export const standingsColumns: readonly Column<StandingRow>[] = [
   {
     key: 'position',
-    header: <ShortHeader short="Pos" full="Position" />,
+    header: <ShortHeader short="Pos" full="Position" alwaysShort />,
     cell: (row) => row.position,
     pinned: true,
     // A fixed width in rem, so it grows with the text size
