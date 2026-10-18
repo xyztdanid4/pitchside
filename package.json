@@ -43,6 +43,7 @@
     "depcruise": "depcruise src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "docs:html": "node scripts/renderApproachPage.js && prettier --write docs/approach.html",
     "prepare": "husky"
   },
   "dependencies": {
@@ -92,6 +93,7 @@
     "jsdom": "^30.1.2",
     "knip": "^6.41.0",
     "lint-staged": "^17.6.0",
+    "marked": "^18.1.1",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "stylelint": "^17.16.0",

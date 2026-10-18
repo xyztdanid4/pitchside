@@ -1,0 +1,1245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Approach and decisions – Pitchside</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --background: #f5f5f4;
+        --surface: #fff;
+        --foreground: #1c1917;
+        --muted: #57534e;
+        --line: #d6d3d1;
+        --brand: #15803d;
+        --head: #1c1917;
+        --on-head: #f5f5f4;
+        --code: #f0efed;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #0c0a09;
+          --surface: #1c1917;
+          --foreground: #e7e5e4;
+          --muted: #a8a29e;
+          --line: #44403c;
+          --brand: #4ade80;
+          --head: #e7e5e4;
+          --on-head: #1c1917;
+          --code: #292524;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--background);
+        color: var(--foreground);
+        font:
+          1rem/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 60rem;
+        margin: 2rem auto;
+        padding: 1.5rem clamp(1rem, 4vw, 3rem) 3rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 0.5rem;
+      }
+      /* Full width on phones: a framed card would only waste the narrow screen */
+      @media (max-width: 40rem) {
+        main {
+          margin: 0;
+          border: 0;
+          border-radius: 0;
+        }
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.25;
+        scroll-margin-top: 1rem;
+      }
+      h1 {
+        font-size: 2.25rem;
+        margin-top: 0.5rem;
+      }
+      h2 {
+        margin-top: 3rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--brand);
+      }
+      h3 {
+        margin-top: 2rem;
+      }
+      hr {
+        display: none;
+      }
+      a {
+        color: var(--brand);
+        text-underline-offset: 0.15em;
+      }
+      p,
+      li {
+        max-width: 75ch;
+      }
+      li + li {
+        margin-top: 0.3rem;
+      }
+      code {
+        padding: 0.1em 0.35em;
+        background: var(--code);
+        border-radius: 0.25rem;
+        font:
+          0.875em/1.4 ui-monospace,
+          monospace;
+      }
+      pre {
+        overflow-x: auto;
+        padding: 1rem;
+        background: var(--code);
+        border-radius: 0.375rem;
+      }
+      pre code {
+        padding: 0;
+        background: none;
+      }
+      .table-scroll {
+        overflow-x: auto;
+        margin: 1rem 0;
+        border: 1px solid var(--line);
+        border-radius: 0.375rem;
+      }
+      /* Narrow screens scroll a table sideways rather than squeezing its columns */
+      table {
+        width: 100%;
+        min-width: 40rem;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        padding: 0.5rem 0.75rem;
+        text-align: start;
+        vertical-align: top;
+      }
+      th {
+        background: var(--head);
+        color: var(--on-head);
+        white-space: nowrap;
+      }
+      tr + tr td {
+        border-top: 1px solid var(--line);
+      }
+      td:first-child {
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Generated from approach.md by `pnpm docs:html`; edit the Markdown file instead -->
+    <main>
+      <h1 id="approach-and-decisions">Approach and decisions</h1>
+      <p>
+        This document explains what was built, how far each requirement of the brief goes, and why
+        each decision was made, including the tooling. The <a href="../README.md">README</a> covers
+        how to run the app; this is the reasoning behind it.
+      </p>
+      <p>
+        Every decision follows the same pattern: what was done, why, what the alternative was, and
+        what it costs.
+      </p>
+      <h2 id="contents">Contents</h2>
+      <ol>
+        <li><a href="#1-the-requirements-one-by-one">The requirements, one by one</a></li>
+        <li><a href="#2-the-discussion-topics">The discussion topics</a></li>
+        <li><a href="#3-domain-decisions">Domain decisions</a></li>
+        <li><a href="#4-architecture">Architecture</a></li>
+        <li><a href="#5-the-table">The table</a></li>
+        <li><a href="#6-visual-style">Visual style</a></li>
+        <li><a href="#7-testing-strategy">Testing strategy</a></li>
+        <li><a href="#8-tooling">Tooling</a></li>
+        <li><a href="#9-scope-what-is-not-here-and-why">Scope: what is not here, and why</a></li>
+      </ol>
+      <hr />
+      <h2 id="1-the-requirements-one-by-one">1. The requirements, one by one</h2>
+      <h3 id="11-the-standings-table">1.1 The standings table</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Status</th>
+              <th>How</th>
+              <th>Checked by</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Recreate the table in the wireframe</td>
+              <td>Done</td>
+              <td>
+                Same columns in the same order as the mockup, plus the champion and relegation tints
+                and the Last 5 column
+              </td>
+              <td><code>App.test.tsx</code> (header names and order, cell values)</td>
+            </tr>
+            <tr>
+              <td>Header row vertically sticky</td>
+              <td>Done</td>
+              <td>
+                <code>position: sticky</code> on the header cells, inside one scroll container
+              </td>
+              <td>e2e: <em>keeps the header row in view while scrolling down</em></td>
+            </tr>
+            <tr>
+              <td>Rows scroll vertically as one unit</td>
+              <td>Done</td>
+              <td>One scroll region wraps the whole table; the page itself never scrolls</td>
+              <td>e2e: <em>scrolls only the table, not the page</em></td>
+            </tr>
+            <tr>
+              <td>Position and Club horizontally sticky</td>
+              <td>Done</td>
+              <td>Pinned columns with fixed <code>rem</code> widths and offsets</td>
+              <td>e2e: <em>keeps Position and Club in view while scrolling sideways</em></td>
+            </tr>
+            <tr>
+              <td>Usable at different viewport sizes</td>
+              <td>Done</td>
+              <td>
+                The same table on every screen; short headers on narrow tables, full names when the
+                table has room; long club names cut off
+              </td>
+              <td>e2e on desktop, Android and iPhone viewports; 20-club load test</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 id="12-the-calculation">1.2 The calculation</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Status</th>
+              <th>How</th>
+              <th>Checked by</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Played, won, drawn, lost, GF, GA, GD, points and form</td>
+              <td>Done</td>
+              <td><code>calculateStandings</code>, a pure function</td>
+              <td>unit tests against the hand-checked fixture table</td>
+            </tr>
+            <tr>
+              <td>3 points for a win, 1 for a draw</td>
+              <td>Done</td>
+              <td>Named constants <code>POINTS_FOR_WIN</code>, <code>POINTS_FOR_DRAW</code></td>
+              <td>unit + property test: points = 3W + D</td>
+            </tr>
+            <tr>
+              <td>Sort: points, goal difference, goals scored, club name</td>
+              <td>Done</td>
+              <td>
+                An ordered list of ranking rules; the first rule that separates two teams decides
+              </td>
+              <td>unit + property test on random seasons</td>
+            </tr>
+            <tr>
+              <td>Scheduled matches without scores must not contribute</td>
+              <td>Done</td>
+              <td>
+                Only <code>completed</code> matches count; a scheduled match&#39;s scores are
+                <code>null</code> in the type
+              </td>
+              <td>unit test; the type makes misuse a compile error</td>
+            </tr>
+            <tr>
+              <td>Keep the calculation logic separate from the UI</td>
+              <td>Done</td>
+              <td>
+                <code>standings/model/</code> has no React and no packages; a lint rule fails the
+                build if it does
+              </td>
+              <td>dependency-cruiser rule <code>model-is-pure</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 id="13-the-deliverables">1.3 The deliverables</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Status</th>
+              <th>Where</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Source code in a Git repository</td>
+              <td>Done</td>
+              <td>This repository, built up in small, conventional commits</td>
+            </tr>
+            <tr>
+              <td>Instructions to run the application</td>
+              <td>Done</td>
+              <td>
+                <a href="../README.md">README</a>: locally, with Docker/Podman, in a Dev Container
+              </td>
+            </tr>
+            <tr>
+              <td>Assumptions documented</td>
+              <td>Done</td>
+              <td>
+                README <em>Assumptions</em>, with the reasons in
+                <a href="#3-domain-decisions">section 3</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Incomplete features documented</td>
+              <td>Done</td>
+              <td><a href="#9-scope-what-is-not-here-and-why">Section 9</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 id="14-beyond-the-brief-and-why">1.4 Beyond the brief, and why</h3>
+      <ul>
+        <li>
+          <strong>Loading, error and empty states.</strong> The data is loaded at runtime, so these
+          states exist whether they are designed or not. The error state has a retry button.
+        </li>
+        <li>
+          <strong>Data validation.</strong> The JSON is checked when it enters the app. Bad data
+          fails with a clear message instead of a wrong table (<a
+            href="#42-data-is-validated-where-it-enters-the-app"
+            >4.2</a
+          >).
+        </li>
+        <li>
+          <strong>Zones and form.</strong> The mockup shows tinted rows and a Last 5 column, so they
+          are part of &quot;recreate the table&quot;.
+        </li>
+        <li>
+          <strong>The tooling.</strong> Deliberately more than a take-home needs;
+          <a href="#8-tooling">section 8</a> explains each piece and its cost.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="2-the-discussion-topics">2. The discussion topics</h2>
+      <h3 id="21-component-hierarchy-and-data-flow">2.1 Component hierarchy and data flow</h3>
+      <pre><code>main.tsx                      StrictMode, fonts, zod config
+└─ App                        page frame: logo, title; exactly the screen&#39;s height
+   └─ StandingsPage           picks what to show from the async state
+      ├─ StatusMessage        loading / error with retry
+      └─ StandingsTable       derives the rows, renders title, table and legend
+         ├─ DataTable         generic: scroll region, sticky header, pinned columns
+         │  └─ cells          from standingsColumns: ShortHeader, FormResults, ...
+         └─ ZoneLegend        names the zone positions in words
+</code></pre>
+      <p>The data flows one way:</p>
+      <pre><code>premier-division.json
+  → fetchJson + CompetitionSourceSchema     unknown in, validated domain data out
+  → useCompetition (useAsync)               loading | error | success
+  → useMemo(calculateStandings → withZones) derived, never stored
+  → DataTable                               renders rows through column definitions
+</code></pre>
+      <ul>
+        <li>
+          <strong>One piece of state.</strong> The only state is the loaded data, held by
+          <code>useAsync</code>. The table is derived from it with <code>useMemo</code>, so it
+          can&#39;t get out of step with it.
+        </li>
+        <li>
+          <strong>One direction.</strong> Components receive data as props; nothing writes back up.
+        </li>
+        <li>
+          <strong>Each step can be replaced on its own.</strong> A real API changes
+          <code>fetchCompetition</code>. If the server starts sending a computed table, the
+          <code>calculateStandings</code> call goes and the table stays.
+        </li>
+      </ul>
+      <h3 id="22-typescript-types-and-key-design-decisions">
+        2.2 TypeScript types and key design decisions
+      </h3>
+      <ul>
+        <li>
+          <strong>Hand-written domain types</strong> (<code>standings/model/competition.ts</code>).
+          <code>Match</code> is a discriminated union on <code>status</code>:
+          <code>completed</code> and <code>live</code> have numeric scores,
+          <code>scheduled</code> has <code>null</code>. The compiler rejects using a scheduled
+          match&#39;s score before checking its status, so the brief&#39;s rule is enforced by the
+          type system as well as by the code.
+        </li>
+        <li>
+          <strong>The schema is tied to the types in both directions.</strong>
+          <code>satisfies z.ZodType&lt;…&gt;</code> makes a mismatch a compile error, but only in
+          one direction: an optional field added to the domain type would still pass. An exact type
+          test (<code>expectTypeOf(…).toEqualTypeOf&lt;…&gt;()</code>) closes that gap.
+        </li>
+        <li>
+          <strong>Why not derive the types from the schema (<code>z.infer</code>)?</strong> That
+          avoids writing the types twice, but couples the domain to zod and to the wire format: a
+          renamed JSON field would change the domain types although the rules of football did not.
+          The schema describes the <em>source</em>; the types describe the <em>domain</em>.
+        </li>
+        <li>
+          <strong>Types over classes.</strong> Plain <code>type</code> aliases and pure functions.
+          React relies on immutable data and reference equality, class instances don&#39;t survive
+          serialisation, and unions are natural with types and awkward with class hierarchies.
+          Everything is <code>readonly</code>.
+        </li>
+        <li>
+          <strong>Derived values are derived, not stored.</strong> Played, won, drawn and lost are
+          counted from the list of results at the end of the calculation, so they can&#39;t disagree
+          with each other. <code>StandingRow</code> adds <code>position</code> only after ranking,
+          so a ranking rule can&#39;t depend on it.
+        </li>
+        <li>
+          <strong>Exhaustive by construction.</strong> <code>switch</code> statements over unions
+          are checked by a lint rule, so a new match result or status is a compile/lint error until
+          every place handles it.
+        </li>
+        <li>
+          <strong>Strict compiler settings</strong>: <code>strict</code>,
+          <code>noUncheckedIndexedAccess</code> (an array or map lookup may be
+          <code>undefined</code>), <code>exactOptionalPropertyTypes</code>,
+          <code>noImplicitReturns</code>.
+        </li>
+      </ul>
+      <h3 id="23-scrolling-issues-and-how-they-are-handled">
+        2.3 Scrolling issues, and how they are handled
+      </h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Handling</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>position: sticky</code> sticks to the nearest scrolling ancestor; a
+                horizontal-only scroller loses the vertical sticky header
+              </td>
+              <td>
+                One scroll region scrolls in both directions; the page is exactly the screen&#39;s
+                height (<code>h-dvh</code>), so only the region scrolls
+              </td>
+            </tr>
+            <tr>
+              <td>
+                A scroll area inside a scrolling page &quot;catches&quot; the scroll on phones
+              </td>
+              <td>The page doesn&#39;t scroll at all; tested by e2e</td>
+            </tr>
+            <tr>
+              <td>Collapsed borders stay behind when cells stick</td>
+              <td>
+                <code>border-separate</code> with zero spacing; the row lines are bottom borders on
+                the cells
+              </td>
+            </tr>
+            <tr>
+              <td>Content shows through sticky cells</td>
+              <td>
+                Every sticky cell has an opaque background, also on tinted rows and in dark mode;
+                the row tone is a typed choice, not a class, so a caller can&#39;t pass a
+                transparent one
+              </td>
+            </tr>
+            <tr>
+              <td>Pinned columns overlap at larger text sizes</td>
+              <td>
+                Widths and offsets are in <code>rem</code> (Tailwind spacing), so they grow with the
+                text; e2e doubles the text size and checks
+              </td>
+            </tr>
+            <tr>
+              <td>The corner cell must cover both scrolling directions</td>
+              <td>
+                Three z-index layers: pinned body cells, header cells, pinned header cells on top
+              </td>
+            </tr>
+            <tr>
+              <td>Visually hidden labels (absolutely positioned) stretched the page sideways</td>
+              <td>
+                The region is <code>relative</code>, so they are clipped inside it; e2e checks the
+                page never scrolls sideways
+              </td>
+            </tr>
+            <tr>
+              <td>Safari has its own sticky bugs</td>
+              <td>The e2e tests also run on WebKit (iPhone viewport)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 id="24-accessibility">2.4 Accessibility</h3>
+      <ul>
+        <li>
+          <strong>A real <code>&lt;table&gt;</code></strong
+          >, not a grid of <code>div</code>s: a <code>&lt;caption&gt;</code>,
+          <code>&lt;th scope=&quot;col&quot;&gt;</code> headers, and the club cell as
+          <code>&lt;th scope=&quot;row&quot;&gt;</code>, so a screen reader announces the club with
+          every cell.
+        </li>
+        <li>
+          <strong>Keyboard scrolling.</strong> The scroll region is focusable
+          (<code>tabIndex={0}</code>), has <code>role=&quot;region&quot;</code> and is named by the
+          caption, so keyboard users can reach and scroll it (WCAG 2.1.1).
+        </li>
+        <li>
+          <strong>Abbreviated headers.</strong> The short label (P, W, GD) is
+          <code>aria-hidden</code>; the full name is in visually hidden text, because
+          <code>title</code> alone is not read reliably. Mouse users get a tooltip.
+        </li>
+        <li>
+          <strong>Nothing relies on color alone</strong> (WCAG 1.4.1). The zone is announced with
+          the position (&quot;1, Champion&quot;), and the legend names the positions in words. Form
+          chips show a letter and are read as &quot;Win&quot;, &quot;Draw&quot;, &quot;Loss&quot;;
+          the list is labelled &quot;Most recent first&quot;.
+        </li>
+        <li>
+          <strong>Status messages.</strong> Loading and empty states are
+          <code>role=&quot;status&quot;</code> (polite), the error is
+          <code>role=&quot;alert&quot;</code>.
+        </li>
+        <li>
+          <strong>Zoom is never disabled</strong> in the viewport meta, and the layout holds at
+          doubled text size.
+        </li>
+        <li>
+          <strong>Color contrast</strong> meets WCAG AA in light and dark mode, checked by axe in a
+          real browser.
+        </li>
+        <li>
+          <strong>Without JavaScript</strong>, a <code>&lt;noscript&gt;</code> message explains why
+          the page is empty.
+        </li>
+      </ul>
+      <p>
+        Automated checks find only part of all accessibility problems; a manual pass with a keyboard
+        and a screen reader is still needed before a release.
+      </p>
+      <h3 id="25-performance">2.5 Performance</h3>
+      <ul>
+        <li>
+          <strong>The calculation</strong> is O(matches + teams · log teams), runs once per loaded
+          data set (<code>useMemo</code>), and rows are keyed by team id.
+        </li>
+        <li>
+          <strong>No virtualisation.</strong> It pays off only with hundreds of rows, and it removes
+          rows from the DOM, which hurts find-in-page and screen readers. A league has around 20
+          clubs.
+        </li>
+        <li>
+          <strong>Fonts are self-hosted and preloaded</strong>: Latin subsets, only the weights in
+          use, with <code>&lt;link rel=&quot;preload&quot;&gt;</code> added after the build, so text
+          doesn&#39;t flash in a fallback font.
+        </li>
+        <li>
+          <strong>No layout shift.</strong> Lighthouse CI fails the run if Cumulative Layout Shift
+          goes above 0.1, and requires 100 for accessibility, best practices and SEO.
+        </li>
+        <li>
+          <strong>Caching in nginx.</strong> Hashed assets are cached for a year as immutable;
+          <code>index.html</code> and the data are revalidated on every load, so a deploy shows up
+          immediately.
+        </li>
+        <li>
+          <strong>What would help next:</strong> the largest paint waits for the script and the data
+          fetch. Embedding the data in the HTML or prerendering the table would move it earlier.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="3-domain-decisions">3. Domain decisions</h2>
+      <p>The brief leaves these open. Each one is listed in the README; this is the reasoning.</p>
+      <ul>
+        <li>
+          <strong
+            >Only <code>completed</code> matches count; the <code>live</code> match (m13) does
+            not.</strong
+          >
+          A live score can still change, and a standings table shows final results. Counting it
+          would show a table that isn&#39;t true yet.
+        </li>
+        <li>
+          <strong
+            >An unknown status (e.g. <code>postponed</code>) skips that match with a console
+            warning.</strong
+          >
+          Failing the whole load because of one unexpected match is too fragile. A match with a
+          <em>known</em> status but invalid data still fails, because then the data itself is wrong.
+          The schema returns the skipped matches as data; the warning is logged at the I/O boundary,
+          so the schema stays pure.
+        </li>
+        <li>
+          <strong>Match order is time order.</strong> The data has no dates, so the order of the
+          <code>matches</code> array decides each club&#39;s form. This is the one assumption the
+          data can&#39;t confirm.
+        </li>
+        <li>
+          <strong>Form shows the last 5 completed results, most recent first</strong>, as league
+          tables do. There are always 5 slots, so the column keeps its width; slots without a match
+          are empty placeholders.
+        </li>
+        <li>
+          <strong>Zones: position 1 is the champion, the bottom 3 are relegated</strong>, as in the
+          mockup. In a league too small for both, the champion spot wins.
+        </li>
+        <li>
+          <strong>Positions are unique (1 to n).</strong> The brief&#39;s last tie-breaker is the
+          club name, so no two clubs share a place. The names are compared with a fixed
+          <code>&#39;en&#39;</code> collator, so the order is the same on every machine. Real tables
+          sometimes show shared places (&quot;=3&quot;); the brief asks for a strict order.
+        </li>
+        <li>
+          <strong>Goal difference is shown with a sign</strong>: <code>+2</code>, <code>0</code>,
+          <code>-1</code>.
+        </li>
+        <li>
+          <strong>Club names are plain text.</strong> The mockup links them to a placeholder URL;
+          there is no club page to link to.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="4-architecture">4. Architecture</h2>
+      <h3 id="41-folders-decided-by-one-question">4.1 Folders decided by one question</h3>
+      <pre><code>src/
+  app/          the page frame
+  standings/    everything about the league table
+    model/      types and pure rules (calculateStandings, zoneFor)
+    api/        where data comes from (schema, fetchCompetition, useCompetition)
+    ui/         the page, the columns, form chips, zone legend
+  shared/       generic code that knows nothing about football
+    ui/         DataTable, StatusMessage
+    lib/        fetchJson, useAsync
+</code></pre>
+      <p>
+        <strong>Does it know about football?</strong> Then it goes in <code>standings/</code>, in
+        the layer that matches what it does. If it would work for any data, it goes in
+        <code>shared/</code>. A second feature (fixtures, say) would get its own folder next to
+        <code>standings/</code> and reuse <code>shared/</code>.
+      </p>
+      <p>
+        This is a reduced form of Feature-Sliced Design: one feature, a shared layer and an app
+        layer. The full set of FSD layers would be too much at this size. Pure layer folders
+        (<code>components/</code>, <code>hooks/</code>, <code>domain/</code>) were the alternative;
+        they scatter one feature across many folders and mix generic code (<code>useAsync</code>)
+        with feature code (<code>useCompetition</code>).
+      </p>
+      <p>
+        <strong>The rules are enforced</strong>, not just intended. dependency-cruiser fails the
+        push and CI if:
+      </p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Rule</th>
+              <th>Forbids</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>model-is-pure</code></td>
+              <td>the model importing anything outside itself (React, zod)</td>
+            </tr>
+            <tr>
+              <td><code>shared-knows-no-football</code></td>
+              <td>
+                <code>shared/</code> importing from <code>standings/</code> or <code>app/</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>api-is-not-ui</code></td>
+              <td>the data layer importing UI code</td>
+            </tr>
+            <tr>
+              <td><code>shared-ui-through-public-api</code></td>
+              <td>reaching into a shared component&#39;s internal files</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Each rule was checked by breaking it on purpose.</p>
+      <h3 id="42-data-is-validated-where-it-enters-the-app">
+        4.2 Data is validated where it enters the app
+      </h3>
+      <p>
+        <code>response.json()</code> is typed <code>any</code>, and
+        <code>as CompetitionData</code> checks nothing: a wrong status, a missing score or an
+        unknown team would pass the cast and fail later, far from the cause. The zod schema checks
+        the data once, at the boundary, and returns the domain types, so nothing past it needs
+        defensive checks. Besides the shape, it checks rules that span records:
+      </p>
+      <ul>
+        <li>team and match ids are unique;</li>
+        <li>every match refers to two existing, different teams;</li>
+        <li>
+          scores are non-negative integers, and <code>null</code> exactly when the match is
+          scheduled.
+        </li>
+      </ul>
+      <p>
+        <strong>zod</strong> because it is widely known and expresses discriminated unions and
+        cross-record rules directly. Smaller libraries (valibot, ArkType) would work too; the size
+        difference doesn&#39;t matter here.
+      </p>
+      <p>
+        <strong>zod and the Content Security Policy.</strong> zod 4 compiles fast parsers with
+        <code>new Function</code>, which the CSP forbids. <code>configureZod.ts</code> turns that
+        off (<code>jitless</code>) before any schema is created. The container e2e run, which serves
+        the app with the real CSP, found this; a local run without the CSP didn&#39;t.
+      </p>
+      <h3 id="43-loading-the-data-with-fetch">4.3 Loading the data with <code>fetch</code></h3>
+      <p>
+        The fixture lives in <code>public/data/</code> and is fetched at runtime, like an API
+        response. A static <code>import</code> would be simpler, but it has no loading or error
+        states, and TypeScript would infer <code>status: string</code> from the JSON, so it would
+        need validation anyway. The URL is built from Vite&#39;s <code>BASE_URL</code>, so the app
+        also works under a sub-path.
+      </p>
+      <h3 id="44-state-without-a-library">4.4 State without a library</h3>
+      <p>
+        <code>useAsync</code> (about 40 lines) holds <code>loading | error | success</code> as a
+        discriminated union, so impossible combinations (&quot;loading, with an error and
+        data&quot;) can&#39;t be represented.
+      </p>
+      <ul>
+        <li>
+          <strong>Races are handled.</strong> Every run gets its own <code>AbortController</code>. A
+          retry or an unmount aborts the previous run, and its late result is dropped, so an old
+          response never overwrites a newer one. React StrictMode&#39;s double mount is harmless for
+          the same reason.
+        </li>
+        <li>
+          <strong>Why not TanStack Query?</strong> It solves server-state synchronisation: caching,
+          refetching, mutations. There is one read-only request here. If those needs appear, it goes
+          behind <code>useCompetition</code> and the components don&#39;t change.
+        </li>
+        <li>
+          <strong>Why not Zustand or Redux?</strong> There is no client state that distant
+          components share. A store would hold one value that only one component reads.
+        </li>
+        <li>
+          <strong>Why not React 19 <code>use()</code> with Suspense?</strong> A good option, but it
+          needs a stable promise cache, a Suspense boundary and an error boundary for retries.
+          <code>useAsync</code> gives the same with explicit states that are easy to test.
+        </li>
+      </ul>
+      <h3 id="45-a-generic-datatable">4.5 A generic <code>DataTable</code></h3>
+      <p>
+        <code>DataTable&lt;Row&gt;</code> takes rows and a list of
+        <code>Column&lt;Row&gt;</code> definitions. All football knowledge is in
+        <code>standingsColumns.tsx</code>.
+      </p>
+      <ul>
+        <li>
+          <strong>The real gain:</strong> a column defines its header and its cell together, so they
+          can&#39;t get out of step, instead of 11 hand-written header cells and 11 matching body
+          cells.
+        </li>
+        <li>
+          <strong>Type safety:</strong> <code>Row</code> is inferred, so columns for one row type
+          can&#39;t be used with another.
+        </li>
+        <li>
+          <strong>Generic, but not unstyled.</strong> It knows nothing about the data, but it
+          carries the app&#39;s look, as a design-system component would.
+        </li>
+        <li>
+          <strong>The honest trade-off:</strong> it has one consumer. It is kept to what this table
+          uses (<code>pinned</code>, <code>isRowHeader</code>, <code>align</code>,
+          <code>rowTone</code>); there is no sorting, filtering or paging. TanStack Table would
+          bring a dependency for features nobody uses.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="5-the-table">5. The table</h2>
+      <h3 id="51-one-table-on-every-screen-no-card-view">
+        5.1 One table on every screen, no card view
+      </h3>
+      <p>
+        The brief asks for sticky Position and Club columns <em>and</em> a table usable at every
+        viewport size. Sticky columns matter most on narrow screens, where the numbers scroll
+        sideways. A card view on phones would remove them exactly where they help, so the phone gets
+        the same table.
+      </p>
+      <h3 id="52-pinned-columns">5.2 Pinned columns</h3>
+      <p>
+        A pinned column sets its own offset and width with Tailwind classes: Position is
+        <code>inset-s-0 w-14</code>, Club is <code>inset-s-14 w-44</code>.
+        <code>DataTable</code> adds <code>sticky</code> and the z-index.
+      </p>
+      <ul>
+        <li>
+          <strong>Simple over general.</strong> With exactly two pinned columns, two classes are
+          easier to read than a function that adds up offsets. The cost is that the Club offset
+          (<code>14</code>) must follow the Position width (<code>w-14</code>); a comment says so,
+          and the e2e tests fail if they drift apart (checked by changing the offset on purpose).
+        </li>
+        <li>
+          <strong><code>rem</code>, not <code>px</code>.</strong> At doubled text size the text and
+          the columns grow together; with <code>px</code> the position text would slide under the
+          Club column.
+        </li>
+        <li>
+          <strong>Long club names</strong> are cut off with an ellipsis instead of pushing the
+          numbers off a phone screen. The full name stays in the tooltip and for screen readers.
+        </li>
+      </ul>
+      <h3 id="53-short-and-full-column-names">5.3 Short and full column names</h3>
+      <p>
+        <code>ShortHeader</code> shows P, W, GD on a narrow table and the full names when the table
+        has room. &quot;Room&quot; is a <strong>container query</strong> on the table&#39;s region
+        (<code>@min-[68rem]</code>), not the screen width: what matters is how wide the table is,
+        not the screen. The threshold comes from measuring the table with full names (about
+        66.6rem), and it is in <code>rem</code>, so it grows with the text size. The width
+        doesn&#39;t depend on the data: club names are cut off, numbers have at most 3 characters,
+        form has 5 slots. An e2e load test with 20 clubs, long names and a full season checks it at
+        1024, 1280 and 1440 px.
+      </p>
+      <p>
+        Position always stays short: its column has a fixed width that the full word wouldn&#39;t
+        fit.
+      </p>
+      <h3 id="54-zones-and-form">5.4 Zones and form</h3>
+      <ul>
+        <li>
+          <strong>Zones</strong> (<code>zoneFor</code>) are a domain rule in <code>model/</code>;
+          how they look is in <code>ui/zones/</code>. <code>DataTable</code> takes a row
+          <em>tone</em> (<code>positive</code> / <code>negative</code>) rather than a class, so the
+          opaque backgrounds the sticky cells need are guaranteed by the table.
+        </li>
+        <li>
+          <strong>Form chips</strong> come from the domain oldest first and are shown newest first.
+          A UI test pins that order, because it is easy to flip by accident.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="6-visual-style">6. Visual style</h2>
+      <ul>
+        <li>
+          <strong>A scoreboard look</strong>: Barlow for text, Barlow Condensed for headings and
+          numbers, a dark header bar, tinted zone rows, compact rows. Condensed numbers keep the
+          columns narrow, which is what lets the full column names fit on a laptop screen.
+        </li>
+        <li>
+          <strong>Self-hosted fonts</strong> (<code>@fontsource</code>). The CSP allows only this
+          origin, and no visitor IP addresses go to a font CDN.
+        </li>
+        <li>
+          <strong>Tailwind v4 with strict tokens.</strong> The default palette is removed (<code
+            >--color-*: initial</code
+          >), so only the project&#39;s color tokens exist. A class like
+          <code>bg-red-500</code> generates no CSS, and ESLint reports it as unknown.
+        </li>
+        <li>
+          <strong>Dark mode through variables.</strong> The tokens point to CSS variables, and
+          <code>prefers-color-scheme: dark</code> swaps the variables. No component has a
+          <code>dark:</code> class.
+        </li>
+        <li>
+          <strong>Logical properties</strong> (<code>ms-</code>, <code>inset-s-</code>,
+          <code>text-start</code>), so the layout would also work in a right-to-left language.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="7-testing-strategy">7. Testing strategy</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>What it catches</th>
+              <th>Where</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Unit</td>
+              <td>calculation rules, schema cases, hooks, components</td>
+              <td><code>src/**/*.test.ts(x)</code></td>
+            </tr>
+            <tr>
+              <td>Property-based</td>
+              <td>rules that hold for any season, on hundreds of random ones (fast-check)</td>
+              <td><code>*.properties.test.ts</code></td>
+            </tr>
+            <tr>
+              <td>Type test</td>
+              <td>the schema&#39;s output and the domain types are exactly the same</td>
+              <td><code>competitionSchema.test.ts</code></td>
+            </tr>
+            <tr>
+              <td>Accessibility</td>
+              <td>axe on rendered components (jsdom), and in real browsers with contrast</td>
+              <td><code>src/test/axe.ts</code>, <code>e2e/</code></td>
+            </tr>
+            <tr>
+              <td>End-to-end</td>
+              <td>sticky behaviour, scrolling, text size, CSP, contrast, three browsers</td>
+              <td><code>e2e/</code></td>
+            </tr>
+            <tr>
+              <td>Lighthouse</td>
+              <td>layout shift, accessibility, best practices, SEO</td>
+              <td><code>lighthouserc.cjs</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>
+          <strong>Property-based tests</strong> state rules instead of examples: goals scored equal
+          goals conceded across the league, wins equal losses, points are 3W + D, the order follows
+          the ranking rules, form is the last results, oldest first. The schema accepts every valid
+          season unchanged and never throws on arbitrary JSON. When a rule is broken, fast-check
+          reports the smallest season that shows it; removing the goals-scored tie-breaker produced
+          a two-match counterexample.
+        </li>
+        <li>
+          <strong>Test data is project data.</strong> Tests use the fixture&#39;s clubs and matches,
+          run through the real schema rather than cast.
+        </li>
+        <li>
+          <strong>jsdom has no layout.</strong> Unit tests check what renders and how it behaves;
+          sticky positioning, contrast and scrolling need a real browser, so Playwright runs the
+          production build on Chromium (desktop and Android viewports) and WebKit (iPhone viewport).
+          A test also fails on any console or page error, which is how CSP violations show up.
+        </li>
+        <li>
+          <strong>Coverage</strong> must stay above 90%, but coverage only shows that code ran. The
+          important tests were checked by breaking the code on purpose (pixel offsets, a missing
+          <code>h-dvh</code>, a too-small breakpoint, <code>satisfies</code> alone, each layer rule)
+          and seeing them fail.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="8-tooling">8. Tooling</h2>
+      <p>
+        The tooling is deliberately more than a take-home needs. It shows the baseline I would set
+        up for a team, where mistakes are caught by a tool rather than in review. The feature itself
+        is kept to the brief. Each tool is below, with what it does, why it is there and what it
+        costs.
+      </p>
+      <h3 id="81-build-and-framework-vite-react-typescript">
+        8.1 Build and framework: Vite, React, TypeScript
+      </h3>
+      <ul>
+        <li>
+          <strong>Vite, no framework.</strong> One read-only view of static data needs no server
+          rendering, routing or server code, so a build tool is enough. Next.js or React
+          Router&#39;s framework mode would bring a server runtime and conventions that solve
+          nothing here.
+        </li>
+        <li>
+          <strong>Revisit when:</strong> several pages (routing), SEO or first-paint requirements
+          (SSR/SSG), or a backend for the frontend.
+        </li>
+      </ul>
+      <h3 id="82-language-strict-typescript">8.2 Language: strict TypeScript</h3>
+      <ul>
+        <li>
+          <code>strict</code>, <code>noUncheckedIndexedAccess</code>,
+          <code>exactOptionalPropertyTypes</code>, <code>noImplicitReturns</code>,
+          <code>noImplicitOverride</code>, <code>erasableSyntaxOnly</code>,
+          <code>verbatimModuleSyntax</code>.
+        </li>
+        <li>
+          <code>noUncheckedIndexedAccess</code> matters most here: the calculation looks teams up by
+          id, and the compiler makes the &quot;not found&quot; case explicit.
+        </li>
+        <li>
+          <strong>Cost:</strong> some extra checks in code (<code>=== undefined</code>), which are
+          the point.
+        </li>
+      </ul>
+      <h3 id="83-package-manager-and-runtime-versions-pnpm-node">
+        8.3 Package manager and runtime versions: pnpm, Node
+      </h3>
+      <ul>
+        <li>
+          <strong>pnpm</strong>: strict <code>node_modules</code> (code can only import declared
+          packages, no phantom dependencies), a shared store, and it blocks dependency install
+          scripts by default.
+        </li>
+        <li>
+          <strong>Versions are enforced, not suggested.</strong> <code>devEngines</code> rejects npm
+          and unsupported Node versions, <code>engine-strict</code> makes the Node range a hard
+          error, <code>packageManager</code> pins the pnpm version, and <code>.nvmrc</code> picks
+          Node 24 (the current LTS) for version managers. The allowed Node range is derived from
+          what the dependencies require, not from preference.
+        </li>
+        <li>
+          <strong>Why:</strong> &quot;works on my machine&quot; problems usually come from a
+          different Node or package manager; this fails at install time with a clear message instead
+          of later with a strange one.
+        </li>
+      </ul>
+      <h3 id="84-formatting-prettier-editorconfig">8.4 Formatting: Prettier, EditorConfig</h3>
+      <ul>
+        <li>
+          Prettier owns all formatting; ESLint only checks correctness
+          (<code>eslint-config-prettier</code>). Tailwind classes are sorted by
+          <code>prettier-plugin-tailwindcss</code>.
+        </li>
+        <li>Set up before any code, so no commit mixes reformatting with real changes.</li>
+      </ul>
+      <h3 id="85-linting-eslint-stylelint">8.5 Linting: ESLint, Stylelint</h3>
+      <ul>
+        <li>
+          <strong>ESLint</strong> with the type-aware presets (<code>typescript-eslint</code> strict
+          and stylistic, <code>@eslint-react</code>, <code>react-hooks</code>,
+          <code>jsx-a11y</code> strict, <code>unicorn</code>, Tailwind correctness, Vitest, Testing
+          Library, Playwright) and <code>--max-warnings 0</code>.
+        </li>
+        <li>
+          <strong>Custom rules</strong> where presets stop: exhaustive <code>switch</code> over
+          unions, no truthiness checks on numbers or strings, sort with a compare function, naming
+          conventions, size limits (complexity, depth, parameters), named exports only, imports only
+          through the <code>@/</code> alias, sorted imports. Every custom rule has a comment saying
+          what it prevents, with a wrong and a right example. A rule that can&#39;t be justified in
+          one sentence isn&#39;t in the config.
+        </li>
+        <li>
+          <strong>Stylelint</strong> with the standard config, property ordering and accessibility
+          rules (no <code>outline: none</code>, focus styles with hover styles, reduced motion
+          respected). No <code>!important</code>, no ID selectors, limited specificity.
+        </li>
+        <li>
+          <strong>Cost:</strong> a learning curve for a new contributor; the comments in the config
+          are there for that.
+        </li>
+      </ul>
+      <h3 id="86-code-health-knip-dependency-cruiser">8.6 Code health: knip, dependency-cruiser</h3>
+      <ul>
+        <li>
+          <strong>knip</strong> reports unused files, exports and dependencies, including
+          dependencies used but only installed indirectly.
+        </li>
+        <li>
+          <strong>dependency-cruiser</strong> turns the architecture into checks: no circular
+          imports, no orphan files, only declared packages, no dev dependencies in app code, no app
+          code importing tests, and the layer rules in
+          <a href="#41-folders-decided-by-one-question">4.1</a>.
+        </li>
+      </ul>
+      <h3 id="87-tests-vitest-testing-library-fast-check-axe-playwright">
+        8.7 Tests: Vitest, Testing Library, fast-check, axe, Playwright
+      </h3>
+      <ul>
+        <li>
+          <strong>Vitest</strong> shares Vite&#39;s configuration and transforms, so tests see the
+          code as the build does. Mocks and stubbed globals are reset after every test.
+        </li>
+        <li>
+          <strong>Testing Library</strong> queries by role and accessible name, the way users and
+          assistive technology find things, so tests double as accessibility checks.
+        </li>
+        <li>
+          <strong>fast-check</strong> for the property-based tests in
+          <a href="#7-testing-strategy">section 7</a>.
+        </li>
+        <li>
+          <strong>axe-core</strong> through a small typed helper, because the usual wrapper
+          (<code>vitest-axe</code>) is unmaintained.
+        </li>
+        <li>
+          <strong>Playwright</strong> for real browsers, with <code>@axe-core/playwright</code> in
+          light and dark mode.
+        </li>
+      </ul>
+      <h3 id="88-performance-budget-lighthouse-ci">8.8 Performance budget: Lighthouse CI</h3>
+      <ul>
+        <li>
+          Audits the production build three times. <strong>Fails</strong> below 100 for
+          accessibility, best practices or SEO, or above 0.1 layout shift.
+          <strong>Warns</strong> for performance below 90, Largest Contentful Paint above 2.5 s or
+          Total Blocking Time above 200 ms, because those depend on the machine&#39;s load.
+        </li>
+        <li>
+          Uses the Chromium Playwright already installed, so there is no second browser to install.
+        </li>
+      </ul>
+      <h3 id="89-git-hooks-husky-lint-staged-commitlint">
+        8.9 Git hooks: Husky, lint-staged, commitlint
+      </h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Hook</th>
+              <th>Runs</th>
+              <th>Why there</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>pre-commit</code></td>
+              <td>ESLint, Stylelint, Prettier on staged files only</td>
+              <td>fast; fixes are re-staged</td>
+            </tr>
+            <tr>
+              <td><code>commit-msg</code></td>
+              <td>commitlint (Conventional Commits)</td>
+              <td>a readable, consistent history</td>
+            </tr>
+            <tr>
+              <td><code>pre-push</code></td>
+              <td>type check, unit tests, knip, dependency-cruiser</td>
+              <td>they need the whole project; too slow per commit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>Trade-off:</strong> hooks check the working tree, not exactly what is committed, so
+        they are fast feedback, not the gate. The gate is CI on a clean checkout. The hooks are kept
+        simple rather than stashing work, which can go wrong.
+      </p>
+      <h3 id="810-containers-docker-or-podman-nginx">8.10 Containers: Docker or Podman, nginx</h3>
+      <ul>
+        <li>
+          <strong>One multi-stage <code>Dockerfile</code>, one <code>compose.yaml</code></strong
+          >, working with both Docker and Podman. The <code>web</code> target serves the production
+          build from an unprivileged nginx: static files only, no Node, no source. The
+          <code>e2e</code> target is Playwright&#39;s official image, which has every browser&#39;s
+          system libraries, so all three browser projects run on any operating system.
+        </li>
+        <li>
+          <strong>nginx</strong> sets a strict Content Security Policy (only this origin, no inline
+          scripts or styles, no framing) and other security headers, caches hashed assets as
+          immutable and revalidates the rest. The headers live in one file included by every
+          <code>location</code>, because an <code>add_header</code> inside a
+          <code>location</code> drops the inherited ones.
+        </li>
+        <li>
+          <strong>The service is called <code>web</code>, not <code>app</code></strong
+          >: <code>.app</code> is a real top-level domain on Chromium&#39;s HSTS preload list, so
+          <code>http://app:8080</code> was forced to HTTPS and every test failed.
+        </li>
+        <li>
+          <strong>The container e2e script stops leftover containers first</strong>, so the tests
+          never run against an old build. A stale container once made a run falsely green.
+        </li>
+        <li>
+          <strong>In real production</strong> a static app would rather be served from a CDN; the
+          container gives a reproducible run and an environment with the real headers.
+        </li>
+      </ul>
+      <h3 id="811-development-environment-dev-container">
+        8.11 Development environment: Dev Container
+      </h3>
+      <ul>
+        <li>
+          <code>.devcontainer/</code> gives Node, pnpm, the Playwright browsers and the editor
+          extensions in VS Code, JetBrains IDEs or GitHub Codespaces.
+          <code>node_modules</code> lives in a volume, so the host&#39;s and the container&#39;s
+          installs never overwrite each other.
+        </li>
+        <li>
+          <code>.vscode/extensions.json</code> recommends the same extensions outside the container.
+        </li>
+      </ul>
+      <h3 id="812-continuous-integration-github-actions">
+        8.12 Continuous integration: GitHub Actions
+      </h3>
+      <ul>
+        <li>
+          Two parallel jobs on a clean checkout: <code>checks</code> (formatting, ESLint, Stylelint,
+          types, unit tests with coverage, knip, dependency-cruiser) and <code>browser</code> (e2e
+          on Chromium and WebKit, Lighthouse). Reports are kept as artifacts, also when a step
+          fails. Node comes from <code>.nvmrc</code>, pnpm from <code>packageManager</code>, and the
+          lockfile is frozen.
+        </li>
+        <li>
+          <strong>Manual trigger only</strong>, to save Actions minutes. Adding
+          <code>push</code> and <code>pull_request</code> triggers is a two-line change.
+        </li>
+      </ul>
+      <hr />
+      <h2 id="9-scope-what-is-not-here-and-why">9. Scope: what is not here, and why</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Not done</th>
+              <th>Why, and what would come next</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>The live match is not shown</td>
+              <td>
+                Its result isn&#39;t final (<a href="#3-domain-decisions">section 3</a>). A
+                &quot;live&quot; toggle would pass the counted statuses to
+                <code>calculateStandings</code> and mark the table as provisional.
+              </td>
+            </tr>
+            <tr>
+              <td>No error boundary</td>
+              <td>
+                Loading and validation errors are handled; a render error would leave an empty page.
+                A production app would have one at the root.
+              </td>
+            </tr>
+            <tr>
+              <td>Pinned columns are wider than a 320 px screen at doubled text size</td>
+              <td>
+                A rare combination. The fix would be a screen-relative Club width, such as
+                <code>min(11rem, 40vw)</code>.
+              </td>
+            </tr>
+            <tr>
+              <td>Skipped matches only show in the console</td>
+              <td>
+                Deliberate: they are not part of the table. A note under the title would make them
+                visible to users.
+              </td>
+            </tr>
+            <tr>
+              <td>Shared positions (&quot;=3&quot;) are not shown</td>
+              <td>
+                The brief&#39;s last tie-breaker is the club name, which gives a strict order.
+              </td>
+            </tr>
+            <tr>
+              <td>No sorting, filtering or virtualisation</td>
+              <td>
+                The brief doesn&#39;t ask for them, and a 20-club table doesn&#39;t need them.
+              </td>
+            </tr>
+            <tr>
+              <td>English only, with a hand-written plural</td>
+              <td>
+                Internationalisation is outside the brief. <code>Intl.PluralRules</code> and a
+                message catalogue would be the next step.
+              </td>
+            </tr>
+            <tr>
+              <td>CI doesn&#39;t run automatically</td>
+              <td>Saves Actions minutes; it is complete and runs on demand.</td>
+            </tr>
+            <tr>
+              <td>Club names are not links</td>
+              <td>The mockup&#39;s links point to a placeholder; there is no club page.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

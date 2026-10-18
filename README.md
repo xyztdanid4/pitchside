@@ -3,6 +3,9 @@
 Football competition standings: league table calculation and a scrollable standings view,
 built with React and TypeScript.
 
+The reasoning behind every decision, requirement by requirement and tool by tool, is in
+[docs/approach.md](docs/approach.md).
+
 ## What it does
 
 - Loads the competition (teams and matches) from `public/data/premier-division.json`, validates
@@ -116,6 +119,7 @@ Dependencies are installed automatically; run `pnpm dev` inside the container.
 | `pnpm depcruise`          | Validate the import graph (cycles, orphans, forbidden imports) |
 | `pnpm format`             | Format all files with Prettier                                 |
 | `pnpm format:check`       | Check formatting without writing                               |
+| `pnpm docs:html`          | Render `docs/approach.md` as a standalone HTML page            |
 
 ## End-to-end tests
 
