@@ -70,10 +70,11 @@ export default {
         path: [String.raw`\.test\.tsx?$`, '^src/test/'],
       },
     },
-    // Layers. Football code lives in standings/ (model -> api), generic code in shared/.
-    // Tests may cross these lines: they use the real competition data.
+    // Layers. Three areas: app/ (the page frame), standings/ (everything about the league
+    // table: model -> api -> ui) and shared/ (generic code that knows nothing about
+    // football). Tests may cross these lines: they use the real competition data.
     {
-      // Shared code works for any data, so it can't know the league table.
+      // Shared code works for any data, so it can't know the league table or the app.
       // The question "does it know about football?" decides where code goes.
       name: 'shared-knows-no-football',
       severity: 'error',
@@ -82,7 +83,7 @@ export default {
         pathNot: String.raw`\.test\.tsx?$`,
       },
       to: {
-        path: '^src/standings/',
+        path: '^src/(standings|app)/',
       },
     },
     {
@@ -96,6 +97,19 @@ export default {
       },
       to: {
         pathNot: '^src/standings/model/',
+      },
+    },
+    {
+      // The api layer loads and validates data; it doesn't render it. So the source can
+      // be swapped (file, API, websocket) without touching the UI.
+      name: 'api-is-not-ui',
+      severity: 'error',
+      from: {
+        path: '^src/standings/api/',
+        pathNot: String.raw`\.test\.tsx?$`,
+      },
+      to: {
+        path: '^src/(standings/ui|app)/',
       },
     },
     {

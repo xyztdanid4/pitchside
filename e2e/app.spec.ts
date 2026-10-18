@@ -21,7 +21,8 @@ test.describe('app', () => {
     })
 
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    // Waits for the data too, so errors while fetching or rendering the table count
+    await expect(page.getByRole('table')).toBeVisible()
 
     expect(errors).toStrictEqual([])
   })
@@ -31,6 +32,8 @@ test.describe('app', () => {
     test(`has no accessibility violations in ${colorScheme} mode`, async ({ page }) => {
       await page.emulateMedia({ colorScheme })
       await page.goto('/')
+      // The table is loaded over fetch: check the page with it, not the loading message
+      await expect(page.getByRole('table')).toBeVisible()
 
       const results = await new AxeBuilder({ page }).analyze()
 

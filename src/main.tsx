@@ -1,8 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
+// Must run before any schema is created, so it's imported before the app
+import '@/app/configureZod.ts'
 import '@/index.css'
-import { App } from '@/App.tsx'
+import { App } from '@/app/App.tsx'
 
 const rootElement = document.querySelector('#root')
 
