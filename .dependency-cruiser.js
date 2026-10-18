@@ -98,6 +98,19 @@ export default {
         pathNot: '^src/standings/model/',
       },
     },
+    {
+      // A shared UI component folder is used through its index.ts, which is its public
+      // API. The other files are internals, so they can be moved or split freely.
+      name: 'shared-ui-through-public-api',
+      severity: 'error',
+      from: {
+        pathNot: '^src/shared/ui/',
+      },
+      to: {
+        path: '^src/shared/ui/[^/]+/',
+        pathNot: String.raw`/index\.ts$`,
+      },
+    },
   ],
 
   options: {

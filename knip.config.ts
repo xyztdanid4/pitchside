@@ -11,12 +11,6 @@ const config: KnipConfig = {
     // Loaded by a <link> in index.html, which knip doesn't follow
     'public/noscript.css',
   ],
-
-  ignoreDependencies: [
-    // Installed with the Testing Library toolkit for simulating user input;
-    // no test imports it yet
-    '@testing-library/user-event',
-  ],
 }
 
 export default config
