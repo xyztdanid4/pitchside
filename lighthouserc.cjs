@@ -10,6 +10,9 @@ module.exports = {
       // Lighthouse CI serves the built files itself
       staticDistDir: './dist',
       chromePath: chromium.executablePath(),
+      // Ubuntu 24.04 CI runners don't allow Chromium's sandbox, so it wouldn't start there.
+      // Playwright launches Chromium without the sandbox too; it only audits our own build.
+      ...(process.env.CI !== undefined && { settings: { chromeFlags: '--no-sandbox' } }),
       // Scores vary between runs; the median of three is stable enough to assert on
       numberOfRuns: 3,
     },
