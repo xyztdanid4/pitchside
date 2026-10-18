@@ -54,7 +54,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Chromium plus the system libraries it needs on Ubuntu
+      # Chromium and WebKit plus the system libraries they need on Ubuntu
       - run: pnpm exec playwright install --with-deps chromium webkit
 
       - run: pnpm test:e2e
