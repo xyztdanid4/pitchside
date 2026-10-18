@@ -5,18 +5,31 @@ import { formatGoalDifference } from '@/standings/ui/columns/formatGoalDifferenc
 import { numberColumn } from '@/standings/ui/columns/numberColumn.tsx'
 import { ShortHeader } from '@/standings/ui/columns/ShortHeader.tsx'
 
-// The columns of the league table, in the order of the mockup
+// The columns of the league table, in the order of the mockup. Position and Club stay
+// in view while the numbers scroll sideways.
 export const standingsColumns: readonly Column<StandingRow>[] = [
   {
     key: 'position',
     header: <ShortHeader short="Pos" full="Position" />,
     cell: (row) => row.position,
+    pinned: true,
+    // A fixed width in rem, so it grows with the text size
+    className: 'inset-s-0 w-14 min-w-14',
   },
   {
     key: 'club',
     header: 'Club',
-    cell: (row) => <span className="font-semibold">{row.team.name}</span>,
+    // A long name is cut off rather than pushing the numbers off a phone screen;
+    // the full name stays in the text for screen readers and in the tooltip
+    cell: (row) => (
+      <span className="block truncate font-semibold" title={row.team.name}>
+        {row.team.name}
+      </span>
+    ),
     isRowHeader: true,
+    pinned: true,
+    // Sticks where Position ends: its offset is Position's width (14)
+    className: 'inset-s-14 w-44 min-w-44',
   },
   numberColumn({ key: 'played', short: 'P', full: 'Matches played', value: (row) => row.played }),
   numberColumn({ key: 'won', short: 'W', full: 'Wins', value: (row) => row.won }),

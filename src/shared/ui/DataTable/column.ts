@@ -12,4 +12,9 @@ export type Column<Row> = {
   readonly align?: 'start' | 'center' | 'end'
   // Marks the cell that names the row, so screen readers announce it with each cell
   readonly isRowHeader?: boolean
+  // Keeps the column in view while the table scrolls sideways. Pinned columns come first,
+  // and each one sets its own offset and width in `className`.
+  readonly pinned?: boolean
+  // Extra classes for every cell of the column, e.g. a pinned column's offset and width
+  readonly className?: string
 }

@@ -73,6 +73,34 @@ describe('DataTable', () => {
     expect(region).toContainElement(screen.getByRole('table'))
   })
 
+  it('makes pinned columns sticky, placed by the classes they give', () => {
+    const pinnedColumns: readonly Column<StandingRow>[] = [
+      {
+        key: 'club',
+        header: 'Club',
+        cell: (row) => row.team.name,
+        pinned: true,
+        className: 'inset-s-0 w-44',
+      },
+      { key: 'points', header: 'Points', cell: (row) => row.points },
+    ]
+    render(
+      <DataTable
+        caption="Premier Division"
+        columns={pinnedColumns}
+        rows={ROWS}
+        rowKey={teamIdOf}
+      />,
+    )
+
+    const [club, points] = screen.getAllByRole('columnheader')
+    expect(club).toHaveClass('sticky', 'inset-s-0', 'w-44')
+    expect(screen.getByText('Glenhaven City')).toHaveClass('sticky', 'inset-s-0', 'w-44')
+    // A column that isn't pinned only sticks to the top, with the header row
+    expect(points).toHaveClass('sticky', 'inset-bs-0')
+    expect(points).not.toHaveClass('inset-s-0')
+  })
+
   it('has no detectable accessibility violations', async () => {
     const { container } = renderTable()
 

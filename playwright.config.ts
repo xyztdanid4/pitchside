@@ -29,7 +29,8 @@ export default defineConfig({
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
-    // Safari's WebKit engine has its own layout bugs, and many phone users are on iPhones
+    // Safari has its own sticky positioning bugs, and iPhones are where the sticky
+    // columns matter most
     { name: 'iphone', use: { ...devices['iPhone 14'] } },
   ],
 })
