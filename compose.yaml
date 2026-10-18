@@ -1,7 +1,9 @@
 # Works with both Docker (`docker compose ...`) and Podman (`podman compose ...`).
 #   Run the app:       compose up --build web       -> http://localhost:8080
-#   Run the e2e tests: compose run --rm --build e2e
-# `--build` rebuilds the images; without it, an existing image is reused even if the code changed.
+#   Run the e2e tests: pnpm test:e2e:container (scripts/e2eContainer.js)
+# The script stops old containers and builds `web` first: `compose run` reuses a running app
+# container and `--build` only rebuilds the service being run, so either would test an old
+# build. `--profile test` is needed by podman-compose.
 name: pitchside
 
 services:

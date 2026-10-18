@@ -14,5 +14,5 @@ sudo corepack enable
 
 pnpm install
 
-# Chromium and its system libraries for the end-to-end tests (`pnpm test:e2e`)
-pnpm exec playwright install --with-deps chromium
+# Chromium, WebKit and their system libraries for the end-to-end tests (`pnpm test:e2e`)
+pnpm exec playwright install --with-deps chromium webkit
