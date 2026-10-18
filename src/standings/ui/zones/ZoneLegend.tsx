@@ -15,7 +15,10 @@ function positionsText(first: number, last: number): string {
  */
 export function ZoneLegend({ rows }: { readonly rows: readonly TableRow[] }) {
   return (
-    <ul aria-label="Zones" className="flex flex-wrap gap-x-5 gap-y-2 px-3 pbs-3 text-xs">
+    <ul
+      aria-label="Zones"
+      className="flex flex-wrap gap-x-5 gap-y-2 border-bs border-line px-4 py-3 text-xs text-muted"
+    >
       {ZONES.map((zone) => {
         const zoneRows = rows.filter((row) => row.zone === zone)
         const first = zoneRows.at(0)

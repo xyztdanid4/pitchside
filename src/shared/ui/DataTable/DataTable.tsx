@@ -20,7 +20,7 @@ function rowBackground(tone: RowTone | undefined): string {
 
 // The bottom border sits on the cells: rows can't have borders in the separate border model.
 // A fixed row height keeps rows the same size whatever a cell contains.
-const CELL_CLASS = 'h-11 border-be border-foreground/15 px-3 whitespace-nowrap'
+const CELL_CLASS = 'h-11 border-be border-line px-3 whitespace-nowrap'
 
 const ALIGN_CLASS = { start: 'text-start', center: 'text-center', end: 'text-end' } as const
 
@@ -73,9 +73,9 @@ export function DataTable<Row>({
               <th
                 key={column.key}
                 scope="col"
-                // Opaque, so content scrolling under it is hidden. Pinned header cells
-                // stick in both directions, so they go above all others.
-                className={`${cellClassOf(column)} sticky inset-bs-0 bg-surface font-semibold ${column.pinned === true ? 'z-3' : 'z-2'}`}
+                // An opaque bar, so content scrolling under it is hidden. Pinned header
+                // cells stick in both directions, so they go above all others.
+                className={`${cellClassOf(column)} sticky inset-bs-0 bg-head font-condensed text-sm font-semibold tracking-wider text-on-head uppercase ${column.pinned === true ? 'z-3' : 'z-2'}`}
               >
                 {column.header}
               </th>

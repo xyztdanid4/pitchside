@@ -32,18 +32,22 @@ export function StandingsTable({ competition }: { readonly competition: Competit
     // Not a named section: the table's scroll region is already the landmark for it.
     // A flex column that may shrink, so the table gets the height that is left.
     <div className="flex min-h-0 flex-col">
-      <h2 className="text-xl font-bold">{competition.competition.name}</h2>
-      <p className="mbe-4 text-sm">
+      <h2 className="font-condensed text-2xl/tight font-bold tracking-wide uppercase">
+        {competition.competition.name}
+      </h2>
+      <p className="mbe-4 text-sm text-muted">
         Standings after {completedCount} {completedCount === 1 ? 'match' : 'matches'}
       </p>
-      <DataTable
-        caption={competition.competition.name}
-        columns={standingsColumns}
-        rows={rows}
-        rowKey={teamIdOf}
-        rowTone={zoneToneOf}
-      />
-      <ZoneLegend rows={rows} />
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-md border border-line bg-surface">
+        <DataTable
+          caption={competition.competition.name}
+          columns={standingsColumns}
+          rows={rows}
+          rowKey={teamIdOf}
+          rowTone={zoneToneOf}
+        />
+        <ZoneLegend rows={rows} />
+      </div>
     </div>
   )
 }

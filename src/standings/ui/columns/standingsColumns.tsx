@@ -14,7 +14,7 @@ export const standingsColumns: readonly Column<TableRow>[] = [
     header: <ShortHeader short="Pos" full="Position" alwaysShort />,
     // The row tint and the dot show the zone; screen readers hear it with the position
     cell: (row) => (
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex items-center gap-1.5 font-condensed text-base font-semibold">
         <span
           aria-hidden="true"
           className={`size-1.5 rounded-full ${row.zone === null ? '' : ZONE_MARK_CLASS[row.zone]}`}
@@ -66,8 +66,13 @@ export const standingsColumns: readonly Column<TableRow>[] = [
   }),
   {
     key: 'points',
-    header: <ShortHeader short="Pts" full="Points" />,
-    cell: (row) => <span className="font-bold">{row.points}</span>,
+    // The column that decides the table stands out in the header bar too
+    header: (
+      <span className="font-bold text-on-head-strong">
+        <ShortHeader short="Pts" full="Points" />
+      </span>
+    ),
+    cell: (row) => <span className="font-condensed text-lg font-bold">{row.points}</span>,
     align: 'center',
   },
 ]
