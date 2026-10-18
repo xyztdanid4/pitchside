@@ -275,6 +275,11 @@ export default defineConfig([
         'error',
         { ignore: ['(^|:)(min-|max-)?[wh]-', '(^|:)size-'] },
       ],
+
+      // `tabIndex` only on interactive elements, except a scrollable region: keyboard
+      // users can only scroll it if it can take focus (WCAG 2.1.1). The region role
+      // and its name tell screen readers what they landed on.
+      'jsx-a11y/no-noninteractive-tabindex': ['error', { roles: ['region'] }],
     },
   },
 

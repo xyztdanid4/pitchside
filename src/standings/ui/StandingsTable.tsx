@@ -21,8 +21,9 @@ export function StandingsTable({ competition }: { readonly competition: Competit
   }
   const completedCount = competition.matches.filter((match) => match.status === 'completed').length
   return (
-    // Not a named section: the table's caption already names it
-    <div>
+    // Not a named section: the table's scroll region is already the landmark for it.
+    // A flex column that may shrink, so the table gets the height that is left.
+    <div className="flex min-h-0 flex-col">
       <h2 className="text-xl font-bold">{competition.competition.name}</h2>
       <p className="mbe-4 text-sm">
         Standings after {completedCount} {completedCount === 1 ? 'match' : 'matches'}

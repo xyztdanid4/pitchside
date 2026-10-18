@@ -26,11 +26,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "vite.config.ts",
-    "prettier.config.ts",
-    "knip.config.ts",
-    "playwright.config.ts",
-    "e2e"
-  ]
+  "include": ["vite.config.ts", "prettier.config.ts", "knip.config.ts", "playwright.config.ts"]
 }

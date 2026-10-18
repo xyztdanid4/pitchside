@@ -65,6 +65,14 @@ describe('DataTable', () => {
     expect(within(leaderRow).getByRole('rowheader')).toHaveTextContent('Glenhaven City')
   })
 
+  it('scrolls inside a region named by the caption, which the keyboard can reach', () => {
+    renderTable()
+
+    const region = screen.getByRole('region', { name: 'Premier Division' })
+    expect(region).toHaveAttribute('tabindex', '0')
+    expect(region).toContainElement(screen.getByRole('table'))
+  })
+
   it('has no detectable accessibility violations', async () => {
     const { container } = renderTable()
 
